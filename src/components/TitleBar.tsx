@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeftRight, BookOpen, LogOut, Settings, User } from 'lucide-react';
+import { ArrowLeftRight, LogOut, Settings, User } from 'lucide-react';
 import { Avatar } from './ui';
 import { bridge, type WindowState } from '../lib/bridge';
 import { useT } from '../lib/i18n/react';
@@ -74,10 +74,6 @@ export function TitleBar() {
 
       {showActions && (
         <div className="titlebar__actions">
-          <Link to="/library" className="btn btn--icon icon-wrap" aria-label={t('My library')} title={t('My library')}>
-            <BookOpen />
-          </Link>
-
           <div className="menu-anchor" ref={anchor}>
             <button
               className="avatar-btn"
