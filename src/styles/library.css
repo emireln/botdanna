@@ -390,7 +390,7 @@ mark.find-hit.is-current {
 }
 
 .answer li::marker {
-  color: var(--primary);
+  color: var(--primary-700);
 }
 
 /* Key terms are bold, with a soft highlight behind them. */

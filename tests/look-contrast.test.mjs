@@ -48,7 +48,7 @@ const PAIRS = [
   ['--muted', '--canvas'],
   ['--muted', '#ffffff'],
   ['--muted', '--canvas-2'],
-  ['#ffffff', '--primary'],
+  ['#ffffff', '--primary-600'],
   ['#ffffff', '--blue'],
   ['#ffffff', '--violet'],
   ['#ffffff', '--red'],
@@ -57,11 +57,13 @@ const PAIRS = [
   ['--mint', '--hero-a'],
   ['--sun-ink', '--sun'],
   ['--ink', '--sun'],
-  ['--primary', '--primary-50'],
+  ['--primary-700', '--primary-50'],
   ['--blue', '--blue-50'],
   ['--violet', '--violet-50'],
   ['--red-ink', '--red-50'],
   ['--primary-700', '--primary-50'],
+  ['--primary-700', '#ffffff'],
+  ['--primary-700', '--canvas'],
 ];
 
 for (const [text, background] of PAIRS) {

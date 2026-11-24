@@ -14,11 +14,11 @@
     --canvas-2: #e6edff;
     --surface-2: #eaf0ff;
 
-    --primary: #5337d2;
-    --primary-600: #4429b8;
-    --primary-700: #3a2693;
-    --primary-50: #efeaff;
-    --primary-100: #dcd2ff;
+    --primary: #f54161;
+    --primary-600: #d52b50;
+    --primary-700: #a71d3c;
+    --primary-50: #feeef2;
+    --primary-100: #fcd5de;
 
     --blue: #1566d6;
     --blue-edge: #0f4fa3;
@@ -29,8 +29,8 @@
     --violet-50: #efeaff;
     --violet-100: #dcd2ff;
 
-    --hero-a: #3d24b5;
-    --hero-b: #6a4bef;
+    --hero-a: #8f1a3c;
+    --hero-b: #d52b50;
     --mint: #7ef3c2;
 
     --sun: #ffc62b;
@@ -67,7 +67,7 @@
   }
 
   :root[data-look='playful'] .eyebrow {
-    color: var(--violet);
+    color: var(--primary-700);
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -111,13 +111,13 @@
   }
 
   :root[data-look='playful'] .btn--primary {
-    background: var(--primary);
+    background: var(--primary-600);
     color: #ffffff;
     box-shadow: 0 4px 0 var(--primary-700);
   }
 
   :root[data-look='playful'] .btn--primary:hover:not(:disabled) {
-    background: var(--primary-600);
+    background: var(--primary-700);
   }
 
   :root[data-look='playful'] .btn--coffee {
@@ -423,7 +423,7 @@
   }
 
   :root[data-look='playful'] .banner--teal {
-    background: var(--primary);
+    background: var(--primary-600);
   }
 
   :root[data-look='playful'] .banner--amber {
@@ -454,7 +454,7 @@
   }
 
   :root[data-look='playful'] .nav__item.is-active {
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   :root[data-look='playful'] .nav__item.is-active::before {
@@ -757,7 +757,7 @@
      Classic look, so the arrow stays visible. */
   :root[data-look='playful'] .coach-send.btn--primary:disabled,
   :root[data-look='playful'] .coach-send.btn--primary:disabled:hover {
-    background: var(--primary);
+    background: var(--primary-600);
     border-color: transparent;
     box-shadow: 0 4px 0 var(--primary-700);
     color: #ffffff;
@@ -1146,14 +1146,14 @@
   :root[data-look='playful'] .segmented__btn[aria-selected='true'],
   :root[data-look='playful'] .segmented__btn.is-active {
     border-color: var(--primary);
-    background: var(--primary);
+    background: var(--primary-600);
     color: #ffffff;
     box-shadow: 0 4px 0 var(--primary-700);
   }
 
   :root[data-look='playful'] .segmented__btn[aria-selected='true']:hover:not(:disabled),
   :root[data-look='playful'] .segmented__btn.is-active:hover:not(:disabled) {
-    background: var(--primary-600);
+    background: var(--primary-700);
   }
 
   /* The flag on a language tab is a little bigger in the Playful look, and on the green tab it has a white ring. */
@@ -1297,19 +1297,19 @@
   }
 
   :root[data-look='playful'] .node--current {
-    background: var(--primary);
+    background: var(--primary-600);
     color: #ffffff;
     border: 0;
     box-shadow: 0 5px 0 var(--primary-700);
   }
 
   :root[data-look='playful'] .node--current:hover:not(:disabled) {
-    background: var(--primary-600);
+    background: var(--primary-700);
   }
 
   :root[data-look='playful'] .node--done {
     background: #ffffff;
-    color: var(--primary);
+    color: var(--primary-700);
     border: 2px solid var(--line-2);
     box-shadow: 0 4px 0 var(--line-2);
   }

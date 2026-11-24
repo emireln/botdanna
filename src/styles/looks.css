@@ -70,11 +70,11 @@
   }
 
   .look-card__preview--classic .look-card__block {
-    background: #f1eefc;
+    background: #feeef2;
   }
 
   .look-card__preview--classic .look-card__button {
-    background: #5337d2;
+    background: #f54161;
   }
 
   /* The Playful picture: bright, with a chunky button that has a visible bottom edge. */
@@ -226,7 +226,7 @@
     place-items: center;
     border-radius: 10px;
     background: var(--primary-50);
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .quest__icon svg {
@@ -273,7 +273,7 @@
   }
 
   .quest--done .quest__count {
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   /* The achievements on the profile: a badge for each, unlocked or locked, with the count toward it. */

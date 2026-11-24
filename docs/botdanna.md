@@ -35,7 +35,7 @@ botdanna is the AI version of danna. It has the same interface, behaviour, style
 
 - The app: name, product name, app id (`app.botdanna.desktop`), installer, shortcuts, tray menu and window title. Version `1.0.0` starts the line.
 - Identifiers: the bridge is `window.botdanna`, the environment variables are `BOTDANNA_*`, and the browser storage keys are `botdanna.*`.
-- The icon, the tray icon, the in-app mark and the installer's side picture are built from `public/icon.png`, the botdanna icon.
+- The app icon and the tray icon are built from `brand/icon.png` and `brand/tray-icon.png`. The in-app mark comes from `brand/logo.png`, and the installer's side picture from `brand/banner.png`.
 
 ## Follow-ups
 

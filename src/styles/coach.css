@@ -39,7 +39,7 @@
     font-weight: 650;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .coach-bar__title {
@@ -61,7 +61,7 @@
   }
 
   .coach-bar__tools .btn--icon.is-on {
-    color: var(--primary);
+    color: var(--primary-700);
     background: var(--primary-50);
   }
 
@@ -103,7 +103,7 @@
   }
 
   .coach-jump:hover {
-    color: var(--primary);
+    color: var(--primary-700);
     border-color: var(--primary);
   }
 
@@ -126,7 +126,7 @@
     max-width: 80%;
     padding: 12px 16px;
     border-radius: 16px 16px 4px 16px;
-    background: var(--primary);
+    background: var(--primary-600);
     color: #fff;
     font-size: 16px;
     line-height: 1.6;
@@ -228,7 +228,7 @@
   }
 
   .turn__tool:hover:not(:disabled) {
-    color: var(--primary);
+    color: var(--primary-700);
     background: var(--surface-2);
   }
 
@@ -359,7 +359,7 @@
   }
 
   .reply-card__model summary {
-    color: var(--primary);
+    color: var(--primary-700);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -375,7 +375,7 @@
     padding: 4px 10px;
     border-radius: 999px;
     background: var(--primary-50);
-    color: var(--primary);
+    color: var(--primary-700);
     font-size: 13px;
     font-weight: 650;
     white-space: nowrap;
@@ -551,7 +551,7 @@
     border: 1px solid var(--primary-100);
     border-radius: 999px;
     background: var(--primary-50);
-    color: var(--primary);
+    color: var(--primary-700);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -685,7 +685,7 @@
     place-items: center;
     border-radius: 10px;
     background: var(--primary-100);
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .mode-card__icon svg {
@@ -887,7 +887,7 @@
   /* An empty message disables the send button. It keeps its blue, and its hover does not turn it pale (the fix on main). */
   .coach-send.btn--primary:disabled,
   .coach-send.btn--primary:disabled:hover {
-    background: var(--primary);
+    background: var(--primary-600);
     color: #fff;
   }
 

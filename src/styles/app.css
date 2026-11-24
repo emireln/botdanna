@@ -1,5 +1,5 @@
-/* botdanna design system. Light, calm and dense enough to scan: white canvas, one blue
-   accent, navy ink, hairline borders, 8 to 12px radii, and one deep-blue hero. */
+/* botdanna design system. Light, calm and dense enough to scan: white canvas, one coral
+   accent (#f54161), navy ink, hairline borders, 8 to 12px radii, and one deep crimson hero. */
 
 @layer reset, tokens, base, layout, components, screens;
 
@@ -16,14 +16,14 @@
     --canvas-2: #f3f5f9;
     --surface-2: #f6f8fb;
 
-    --primary: #5337d2;
-    --primary-600: #4429b8;
-    --primary-700: #3a2693;
-    --primary-50: #f1eefc;
-    --primary-100: #e1dbf8;
+    --primary: #f54161;
+    --primary-600: #d52b50;
+    --primary-700: #a71d3c;
+    --primary-50: #feeef2;
+    --primary-100: #fcd5de;
 
-    --hero-a: #1c3bb0;
-    --hero-b: #3564ea;
+    --hero-a: #8f1a3c;
+    --hero-b: #d52b50;
 
     --teal: #13b5a4;
     --amber: #f5b400;
@@ -245,7 +245,7 @@
   }
 
   .nav__item.is-active {
-    color: var(--primary);
+    color: var(--primary-700);
     font-weight: 650;
   }
 
@@ -274,7 +274,7 @@
     padding: 3px 4px;
     border-radius: 4px;
     background: var(--primary-100);
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .page {
@@ -373,7 +373,7 @@
     font-weight: 650;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .tag {
@@ -389,7 +389,7 @@
 
   .tag--blue {
     color: #fff;
-    background: var(--primary);
+    background: var(--primary-600);
   }
 
   .chip {
@@ -413,7 +413,7 @@
   }
 
   .chip--ai {
-    color: var(--primary);
+    color: var(--primary-700);
     background: var(--primary-50);
     border-color: transparent;
   }
@@ -499,7 +499,7 @@
     display: grid;
     place-items: center;
     background: var(--primary-50);
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .icon-tile svg {
@@ -562,13 +562,13 @@
   }
 
   .btn--primary {
-    background: var(--primary);
+    background: var(--primary-600);
     color: #fff;
     box-shadow: 0 8px 18px -10px rgba(83, 55, 210, 0.85);
   }
 
   .btn--primary:hover:not(:disabled) {
-    background: var(--primary-600);
+    background: var(--primary-700);
   }
 
   /* The coffee button: yellow, with dark text, so it stands apart from the blue buttons. */
@@ -612,7 +612,7 @@
   .btn--text {
     height: auto;
     padding: 0;
-    color: var(--primary);
+    color: var(--primary-700);
     font-weight: 620;
   }
 
@@ -653,7 +653,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: var(--primary);
+    color: var(--primary-700);
     font-weight: 600;
     font-size: 14px;
   }
@@ -873,7 +873,7 @@
     color: #fff;
     font-size: 13px;
     font-weight: 700;
-    background: var(--primary);
+    background: var(--primary-600);
     user-select: none;
   }
 
@@ -1151,7 +1151,7 @@
     border-radius: 10px;
     padding: 22px 22px 20px;
     color: #fff;
-    background: linear-gradient(115deg, var(--hero-a) 0%, #2a4fd2 58%, var(--hero-b) 100%);
+    background: linear-gradient(115deg, var(--hero-a) 0%, #b8244a 58%, var(--hero-b) 100%);
     box-shadow: 0 16px 30px -22px rgba(28, 59, 176, 0.9);
   }
 
@@ -1273,14 +1273,14 @@
   .strip svg {
     width: 20px;
     height: 20px;
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .strip__value {
     margin-left: auto;
     font-size: 16px;
     font-weight: 750;
-    color: var(--primary);
+    color: var(--primary-700);
     letter-spacing: 0.01em;
   }
 
@@ -2018,7 +2018,7 @@
 
   .option[aria-checked='true'] .option__key {
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .option--correct {
@@ -2447,7 +2447,7 @@
     width: 16px;
     height: 16px;
     margin-top: 2px;
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .plan {
@@ -2722,7 +2722,7 @@
 
   .bubble--user {
     align-self: flex-end;
-    background: var(--primary);
+    background: var(--primary-600);
     color: #fff;
     border-bottom-right-radius: 4px;
   }
@@ -2779,7 +2779,7 @@
 
   .suggest button:hover {
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   /* ---------- Review ---------- */
@@ -2800,7 +2800,7 @@
     font-weight: 760;
     letter-spacing: -0.04em;
     line-height: 1;
-    color: var(--primary);
+    color: var(--primary-700);
     font-variant-numeric: tabular-nums;
   }
 
@@ -2993,7 +2993,7 @@
     height: 24px;
     padding: 0 9px;
     border-radius: 8px;
-    background: linear-gradient(120deg, #5337d2 0%, #6b3fd6 100%);
+    background: linear-gradient(120deg, var(--hero-a) 0%, var(--hero-b) 100%);
     color: #ffffff;
     font-size: 11px;
     font-weight: 800;

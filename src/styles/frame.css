@@ -362,7 +362,7 @@
     display: grid;
     place-items: center;
     background: var(--primary-50);
-    color: var(--primary);
+    color: var(--primary-700);
   }
 
   .welcome__point-icon svg {
