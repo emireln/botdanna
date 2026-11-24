@@ -2,6 +2,7 @@
 // (exercise, chips, feedback, vocab or actions) and one JSON value. Everything else is plain text. A block that
 // does not read as it should is left out, so the rest of the reply still shows. The grading and the checks here
 // are the same on every screen.
+import { LIVE_TALK_ENABLED } from './features';
 
 export type ExerciseItem =
   | { type: 'choice'; prompt: string; options: string[]; answer: number; explain: string }
@@ -77,7 +78,9 @@ const BLOCK = /```(exercise|chips|feedback|vocab|actions)[ \t]*\r?\n([\s\S]*?)\r
 const OPENING = /```(exercise|chips|feedback|vocab|actions)\b/;
 
 /** The pages of the app the coach may send the learner to. Only these paths become buttons. */
-export const ROUTE_PATTERN = /^\/(coach\/live|write|library|profile|settings)$/;
+export const ROUTE_PATTERN = LIVE_TALK_ENABLED
+  ? /^\/(coach\/live|write|library|profile|settings)$/
+  : /^\/(write|library|profile|settings)$/;
 
 export function isAppRoute(path: string): boolean {
   return ROUTE_PATTERN.test(path);
@@ -91,7 +94,9 @@ export const COACH_BLOCK_GUIDE = [
   '  {"title": "Past simple", "items": [{"type": "choice", "prompt": "Yesterday I ___ to the cinema.", "options": ["go", "went", "gone"], "answer": 1, "explain": "Yesterday needs the past simple, went."}]}',
   '- ```feedback, then {"title": string, "scores": [{"label": string, "score": number from 0 to 5}], "summary": string, "corrections": [{"before": string, "after": string, "why": string}], "model": string}, for a text the learner wrote. "before" quotes the learner\'s own words exactly.',
   '- ```vocab, then {"items": [{"word": string, "meaning": string, "example": string, "note": string}]}, for new words. Each "example" uses the exact word, so the app can save it for review.',
-  '- ```actions, then {"items": [{"label": string, "to": string}]}, to send the learner to a page of the app. The allowed paths are /coach/live (talk live), /write (the writing check), /library (the learner\'s files), /profile and /settings (the AI key and the voices).',
+  '- ```actions, then {"items": [{"label": string, "to": string}]}, to send the learner to a page of the app. The allowed paths are ' +
+    (LIVE_TALK_ENABLED ? '/coach/live (talk live), ' : '') +
+    '/write (the writing check), /library (the learner\'s files), /profile and /settings (the AI key and the voices).',
   '- ```chips, then a JSON list of two to four short replies the learner can tap next, written in the reply language. End most replies with one.',
   'Never write the answers in the text, and never write an answer key. The app marks the answers.',
 ].join('\n');

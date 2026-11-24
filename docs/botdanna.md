@@ -6,7 +6,7 @@ botdanna is the AI version of danna. It has the same interface, behaviour, style
 
 - **Accounts and onboarding.** Welcome, sign in and sign up, the setup (look, name, goal, level and an AI key), and the profile picture and banner. The accounts and the cloud profile are the same as danna's.
 - **The coach.** The chat with its ten modes and the role-play scenes, the coach's cards (exercises, feedback, vocabulary, actions and quick replies), attachments, read aloud, export, and recent chats.
-- **Talk live.** The 3D coach (drawn by TalkingHead), the Gemini Live engine, and the typed engine that reads with the app's voice.
+- **Talk live (switched off for now).** The 3D coach (drawn by TalkingHead), the Gemini Live engine, and the typed engine that reads with the app's voice stay in the code. `LIVE_TALK_ENABLED` in `src/lib/features.ts` hides the tab, the coach card and the page until the talk is ready.
 - **Writing check.** The check with a model or with local rules, and the fixes that can be taken or ignored.
 - **Library.** Files and learning links, the library's coach, and word help with save-to-review.
 - **Settings.** Language, look, sounds, AI keys and models, the listening voice, the tray, the account, updates and feedback.

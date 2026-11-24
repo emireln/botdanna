@@ -423,7 +423,7 @@ export function SettingsScreen() {
       <div className="stack">
         <p className="small muted">
           {t(
-            'Bring your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. It powers the coach, the writing check and talk live. The key stays on this device.',
+            'Bring your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. It powers the coach and the writing check. The key stays on this device.',
           )}
         </p>
 

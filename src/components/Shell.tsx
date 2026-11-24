@@ -2,14 +2,16 @@ import { useLayoutEffect, useRef, type ComponentType } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { BookOpen, Bot, Mic, PenLine } from 'lucide-react';
 import { useT } from '../lib/i18n/react';
+import { LIVE_TALK_ENABLED } from '../lib/features';
 
-// The four places of the app: the coach (home), talk live, the writing check and the learner's files.
+// The places of the app: the coach (home), the writing check and the learner's files. Talk live joins them when
+// LIVE_TALK_ENABLED is on (src/lib/features.ts).
 const TABS: Array<{ to: string; label: string; icon: ComponentType<{ 'aria-hidden'?: boolean }>; end: boolean }> = [
   { to: '/', label: 'Coach', icon: Bot, end: true },
   { to: '/coach/live', label: 'Live', icon: Mic, end: false },
   { to: '/write', label: 'Write', icon: PenLine, end: false },
   { to: '/library', label: 'Library', icon: BookOpen, end: false },
-];
+].filter((tab) => LIVE_TALK_ENABLED || tab.to !== '/coach/live');
 
 function BottomNav() {
   const t = useT();

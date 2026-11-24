@@ -1693,8 +1693,8 @@ export const APP_PT: Record<string, string> = {
   'Menus and the coach use this language.': 'Os menus e o coach usam este idioma.',
   'Sync your chats and files across your devices.': 'Sincronize suas conversas e arquivos entre seus dispositivos.',
   'Short, friendly sounds for your answers and the coach.': 'Sons curtos e amigáveis para as suas respostas e o coach.',
-  'Bring your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. It powers the coach, the writing check and talk live. The key stays on this device.':
-    'Use sua própria chave da OpenAI, Anthropic, Google Gemini, OpenRouter ou DeepSeek. Ela alimenta o coach, a verificação de textos e a conversa ao vivo. A chave fica neste dispositivo.',
+  'Bring your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. It powers the coach and the writing check. The key stays on this device.':
+    'Use sua própria chave da OpenAI, Anthropic, Google Gemini, OpenRouter ou DeepSeek. Ela alimenta o coach e a verificação de textos. A chave fica neste dispositivo.',
   'Data saved on this device': 'Dados salvos neste dispositivo',
   'Chats, files, your picture and your profile can be added to your account.': 'Conversas, arquivos, sua foto e seu perfil podem ser adicionados à sua conta.',
   "Add this device's data?": 'Adicionar os dados deste dispositivo?',

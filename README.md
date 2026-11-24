@@ -6,7 +6,6 @@
 
 - **Chat with the coach.** Ask anything about English, or pick a way to work: conversation practice, fix my writing, speaking practice, exam practice, a grammar lesson, a vocabulary builder, read and discuss, or practise your mistakes. The coach adapts to your level and goal, and every reply can include exercises, a feedback card, vocabulary to save, and quick replies.
 - **Role-play scenes.** Practise real situations with a character: ordering at a café, a job interview, a hotel check-in, a complaint at a shop, and more. A scene ends with a short summary of what went well.
-- **Talk live.** Speak with a 3D coach that answers as you talk. You can interrupt it, and the transcript can be saved to your chats.
 - **Writing check.** Write up to 1,500 words. The check gives a score, a tone, and a fix for each issue, with the reason written in your language. Take the fixes you agree with.
 - **Your files.** Keep PDF, TXT and Markdown files and learning links in your library. Ask the coach about them, and tap a word while you read to see its meaning and save it for review.
 - **Listen.** Read-aloud uses a built-in voice that works offline, or a Windows voice, or an OpenAI or Gemini voice with your key.
@@ -17,7 +16,6 @@
 botdanna works with your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. The key is encrypted on your computer with the protection Windows provides, and your messages go straight from the app to the provider you chose.
 
 - The coach, the writing check, the word help and the practice all use the chat model of the provider you choose.
-- Talk live with a Gemini key uses Gemini Live. Talk live with another key types the conversation and needs an OpenAI or Gemini key for voice input.
 - Speech-to-text (speaking practice and the coach's microphone) needs an OpenAI or Gemini key.
 
 ## Accounts and data
@@ -32,7 +30,6 @@ Download `botdanna-setup-<version>-x64.exe` from the latest release and run it. 
 ## Privacy
 
 - Each coach reply is sent to the provider you chose, with the recent messages of the chat, the files you attached, and a short summary of your learning: your level, goal, exam date, skill scores and recent mistakes. Your name and email are not included.
-- Talk live with Gemini sends your voice to Google while the talk runs. The app shows a notice the first time on each device, and it stops the talk when the window is hidden.
 
 ## For developers
 

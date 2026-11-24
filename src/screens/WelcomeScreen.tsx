@@ -7,11 +7,12 @@ import { FLAGS } from '../components/LanguageSwitch';
 import { LANGUAGES, type Lang } from '../lib/i18n';
 import { useLanguage, useT } from '../lib/i18n/react';
 import { markWelcomed, onlineAvailable } from '../lib/session';
+import { LIVE_TALK_ENABLED } from '../lib/features';
 import { useAuth } from '../state/auth';
 
 const POINTS = [
   { icon: MessageCircle, text: 'A coach that answers any question about English, at your level' },
-  { icon: Mic, text: 'Talk live with a voice coach, and practise speaking' },
+  { icon: Mic, text: 'Talk live with a voice coach, and practise speaking', live: true },
   { icon: PenLine, text: 'A writing check with a fix and a reason for every change' },
 ];
 
@@ -96,7 +97,7 @@ export function WelcomeScreen() {
                 </div>
                 <h1 className="welcome__title">{t('Your AI English coach, ready whenever you are.')}</h1>
                 <div className="welcome__points">
-                  {POINTS.map((point) => {
+                  {POINTS.filter((point) => !point.live || LIVE_TALK_ENABLED).map((point) => {
                     const Icon = point.icon;
                     return (
                       <div key={point.text} className="welcome__point">

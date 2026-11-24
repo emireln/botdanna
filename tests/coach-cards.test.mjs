@@ -8,10 +8,12 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('..', import.meta.url));
 let server;
 let reply;
+let features;
 
 before(async () => {
   server = await createServer({ root, configFile: false, logLevel: 'silent', appType: 'custom', server: { middlewareMode: true, hmr: false } });
   reply = await server.ssrLoadModule('/src/lib/coachReply.ts');
+  features = await server.ssrLoadModule('/src/lib/features.ts');
 });
 
 after(async () => {
@@ -63,11 +65,13 @@ test('an actions card keeps only the pages of the app, so the learner is sent on
     '```actions\n{"items":[{"label":"Talk","to":"/coach/live"},{"label":"Outside","to":"https://evil.example"},{"label":"Old page","to":"/study/listening"},{"label":"Settings","to":"/settings"},{"label":"Writing","to":"/write"},{"label":"Home","to":"/"}]}\n```',
   );
   assert.equal(card.kind, 'actions');
+  const talk = features.LIVE_TALK_ENABLED ? [{ label: 'Talk', to: '/coach/live' }] : [];
   assert.deepEqual(card.actions, [
-    { label: 'Talk', to: '/coach/live' },
+    ...talk,
     { label: 'Settings', to: '/settings' },
     { label: 'Writing', to: '/write' },
   ]);
+  assert.equal(reply.isAppRoute('/coach/live'), features.LIVE_TALK_ENABLED);
   assert.equal(reply.isAppRoute('/write'), true);
   assert.equal(reply.isAppRoute('/play/test/mock-b1-reading-listening'), false);
   assert.equal(reply.isAppRoute('//evil.example'), false);
