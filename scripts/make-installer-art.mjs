@@ -10,7 +10,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const BANNER = join(root, 'brand', 'banner.png');
 const WIDTH = 164;
 const HEIGHT = 314;
-// A BMP has no transparency, so any see-through part of the banner is filled with the app's purple.
+// A BMP has no transparency, so any see-through part of the banner is filled with the app's coral.
 const BACKGROUND = '#d52b50';
 
 /** A 24-bit uncompressed BMP from top-down RGB pixels (the format the installer expects). */
