@@ -1,6 +1,6 @@
 # botdanna
 
-**Your AI English coach.** botdanna is a Windows app for learning English with a coach that answers any question, talks with you out loud, and checks your writing. It works with your own AI key, and it uses the same accounts and cloud data as [danna](https://github.com/emireln/danna), so you can sign in with the same account in both apps.
+**Your AI English coach.** botdanna is a Windows app for learning English with a coach that answers any question, practises real situations with you, and checks your writing. It works with your own AI key, and it uses the same accounts and cloud data as [danna](https://github.com/emireln/danna), so you can sign in with the same account in both apps.
 
 ## What you can do
 
@@ -20,7 +20,7 @@ botdanna works with your own key from OpenAI, Anthropic, Google Gemini, OpenRout
 
 ## Accounts and data
 
-- **With an online account**, your chats, files, profile and AI keys (sealed with your password) are kept in the account, and they are the same ones danna uses.
+- **With an online account**, your chats, files, profile and AI keys (sealed with your password) are kept in that account, the same one danna uses.
 - **On this device**, everything stays on your computer, and nothing is sent anywhere except to the AI provider when you ask the coach something.
 
 ## Install
