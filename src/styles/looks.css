@@ -1,0 +1,564 @@
+/* The look picker in Settings: two radio cards, each with a small picture of its look.
+   The Playful theme itself is in playful.css. */
+@layer looks {
+  .look-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .look-card {
+    position: relative;
+    display: grid;
+    gap: 6px;
+    align-content: start;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--canvas);
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .look-card[aria-checked='true'] {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-100);
+  }
+
+  .look-card:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .look-card__preview {
+    display: grid;
+    gap: 6px;
+    height: 84px;
+    padding: 10px;
+    border-radius: var(--radius);
+    background: var(--canvas-2);
+  }
+
+  .look-card__bar {
+    width: 40%;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--line-2);
+  }
+
+  .look-card__block {
+    height: 30px;
+    border-radius: 6px;
+    background: var(--primary-50);
+  }
+
+  .look-card__button {
+    width: 46px;
+    height: 14px;
+    border-radius: 4px;
+    background: var(--primary);
+  }
+
+  /* The Classic picture keeps the Classic colours, whatever the look of the page is. */
+  .look-card__preview--classic {
+    background: #f3f5f9;
+  }
+
+  .look-card__preview--classic .look-card__bar {
+    background: #d5dce8;
+  }
+
+  .look-card__preview--classic .look-card__block {
+    background: #f1eefc;
+  }
+
+  .look-card__preview--classic .look-card__button {
+    background: #5337d2;
+  }
+
+  /* The Playful picture: bright, with a chunky button that has a visible bottom edge. */
+  .look-card__preview--playful {
+    background: #eef6ff;
+  }
+
+  .look-card__preview--playful .look-card__bar {
+    background: #b9cde6;
+  }
+
+  .look-card__preview--playful .look-card__block {
+    border: 2px solid #d6e4f5;
+    border-radius: 14px;
+    background: #ffffff;
+  }
+
+  .look-card__preview--playful .look-card__button {
+    height: 16px;
+    border-radius: 10px;
+    background: #128a4e;
+    box-shadow: 0 3px 0 #0c6b3b;
+  }
+
+  .look-card__title {
+    font-weight: 700;
+  }
+
+  .look-card__text {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .look-card__tick {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    width: 22px;
+    height: 22px;
+    place-items: center;
+    border-radius: 6px;
+    background: var(--primary);
+    color: #ffffff;
+  }
+
+  .look-card__tick:empty {
+    display: none;
+  }
+
+  .look-card__tick svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Today's goal row: the daily goal ring and the quests, side by side. */
+  .goal-row {
+    align-items: stretch;
+  }
+
+  .goal-card {
+    height: 100%;
+  }
+
+  .daily-goal {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+  }
+
+  .daily-goal__ring {
+    flex: none;
+    width: 84px;
+    height: 84px;
+  }
+
+  .daily-goal__track {
+    fill: none;
+    stroke: var(--line);
+    stroke-width: 8;
+  }
+
+  .daily-goal__value {
+    fill: none;
+    stroke: var(--primary);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.6s var(--ease);
+  }
+
+  .daily-goal__text {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .daily-goal__title {
+    font-weight: 700;
+  }
+
+  .daily-goal__count {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .quests {
+    display: grid;
+    gap: 10px;
+  }
+
+  .quests__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-weight: 700;
+  }
+
+  .quests__count {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .quests__list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .quest {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .quest__icon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border-radius: 10px;
+    background: var(--primary-50);
+    color: var(--primary);
+  }
+
+  .quest__icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .quest__body {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .quest__title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .quest__bar {
+    display: block;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .quest__bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--primary);
+    transition: width 0.4s var(--ease);
+  }
+
+  .quest__count {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .quest--done .quest__icon {
+    background: var(--primary);
+    color: #ffffff;
+  }
+
+  .quest--done .quest__count {
+    color: var(--primary);
+  }
+
+  /* The achievements on the profile: a badge for each, unlocked or locked, with the count toward it. */
+  .achievements {
+    display: grid;
+    gap: 12px;
+  }
+
+  .achievements__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .achievements__title {
+    font-weight: 800;
+  }
+
+  .achievements__count {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .achievements__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .achievement {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--canvas);
+  }
+
+  .achievement__badge {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 12px;
+    background: var(--surface-2);
+    color: var(--muted);
+  }
+
+  .achievement__badge svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .achievement--on .achievement__badge {
+    background: var(--violet);
+    color: #ffffff;
+  }
+
+  .achievement__body {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .achievement__title {
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .achievement__text {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
+  .achievement__bar {
+    display: block;
+    height: 6px;
+    margin-top: 4px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .achievement__bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--violet);
+  }
+
+  .achievement__state {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .achievement--on .achievement__state {
+    color: var(--violet);
+  }
+
+  @media (max-width: 640px) {
+    .achievements__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* The weekly league on the profile: the tier, the week's XP, the way to the next tier, and the ranking. */
+  .league {
+    display: grid;
+    gap: 12px;
+  }
+
+  .league__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .league__title {
+    font-weight: 800;
+  }
+
+  .league__tier {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 10px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .league__week {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .league__next {
+    display: grid;
+    gap: 6px;
+  }
+
+  .league__bar {
+    display: block;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+  }
+
+  .league__bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--primary);
+    transition: width 0.5s var(--ease);
+  }
+
+  .league__hint {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .league__place {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .league__list {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .league__row {
+    display: grid;
+    grid-template-columns: 24px 30px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+
+  .league__row--me {
+    background: var(--primary-50);
+  }
+
+  .league__position {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .league__who {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .league__name {
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .league__xp {
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .league__days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    align-items: end;
+    gap: 8px;
+    height: 110px;
+  }
+
+  .league__day {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 6px;
+    height: 100%;
+    justify-items: center;
+  }
+
+  .league__column {
+    align-self: end;
+    width: 100%;
+    max-width: 28px;
+    border-radius: 8px 8px 4px 4px;
+    background: var(--primary);
+  }
+
+  .league__date {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .league__note {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  @media (max-width: 640px) {
+    .look-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* The next roadmap lesson rings in the Playful look too. The ring keeps the button's edge, which the Classic pulse
+     does not have. */
+  @keyframes pulse-playful {
+    0% {
+      box-shadow: 0 5px 0 var(--primary-700), 0 0 0 0 rgba(83, 55, 210, 0.35);
+    }
+    70% {
+      box-shadow: 0 5px 0 var(--primary-700), 0 0 0 16px rgba(83, 55, 210, 0);
+    }
+    100% {
+      box-shadow: 0 5px 0 var(--primary-700), 0 0 0 0 rgba(83, 55, 210, 0);
+    }
+  }
+}

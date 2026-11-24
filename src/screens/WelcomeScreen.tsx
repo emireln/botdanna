@@ -1,0 +1,182 @@
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Navigate, useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Check, Cloud, Laptop, Mic, MessageCircle, PenLine } from 'lucide-react';
+import { BrandMark, Wordmark } from '../components/ui';
+import { FLAGS } from '../components/LanguageSwitch';
+import { LANGUAGES, type Lang } from '../lib/i18n';
+import { useLanguage, useT } from '../lib/i18n/react';
+import { markWelcomed, onlineAvailable } from '../lib/session';
+import { useAuth } from '../state/auth';
+
+const POINTS = [
+  { icon: MessageCircle, text: 'A coach that answers any question about English, at your level' },
+  { icon: Mic, text: 'Talk live with a voice coach, and practise speaking' },
+  { icon: PenLine, text: 'A writing check with a fix and a reason for every change' },
+];
+
+type Choice = 'device' | 'account';
+
+// Each language is named in its own words, so a person finds theirs whatever language the page is in.
+const LANGUAGE_NAMES: Record<Lang, string> = { en: 'English', pt: 'Português (Brasil)' };
+
+export function WelcomeScreen() {
+  const navigate = useNavigate();
+  const t = useT();
+  const { lang, setLang } = useLanguage();
+  const { status, useOffline } = useAuth();
+  const [step, setStep] = useState(0);
+  const [choice, setChoice] = useState<Choice | null>(null);
+  const online = onlineAvailable();
+
+  if (status === 'in') return <Navigate to="/" replace />;
+
+  const finish = () => {
+    markWelcomed();
+    if (choice === 'device') {
+      useOffline();
+      navigate('/setup', { replace: true });
+    } else {
+      navigate('/auth', { replace: true, state: { next: '/setup' } });
+    }
+  };
+
+  return (
+    <div className="welcome">
+      <div className="welcome__body">
+        <div className="welcome__card">
+          <AnimatePresence mode="wait" initial={false}>
+            {step === 0 && (
+              <motion.div
+                key="language"
+                className="welcome__card"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div>
+                  <p className="eyebrow">{t('Language')}</p>
+                  <h1 className="welcome__title mt-2">{t('Choose your language')}</h1>
+                  <p className="muted mt-2">{t('You can change it later in Settings.')}</p>
+                </div>
+                <div className="mode-grid" role="radiogroup" aria-label={t('Language')}>
+                  {LANGUAGES.map((item) => {
+                    const selected = lang === item.code;
+                    return (
+                      <button
+                        key={item.code}
+                        role="radio"
+                        aria-checked={selected}
+                        className="mode-card lang-card"
+                        onClick={() => setLang(item.code)}
+                      >
+                        <img className="lang-card__flag" src={FLAGS[item.code]} alt="" />
+                        <span className="mode-card__title">{LANGUAGE_NAMES[item.code]}</span>
+                        <span className="mode-card__tick">{selected && <Check aria-hidden="true" />}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {step === 1 && (
+              <motion.div
+                key="intro"
+                className="welcome__card"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div className="welcome__brand">
+                  <BrandMark size={48} />
+                  <Wordmark className="wordmark--xl" />
+                </div>
+                <h1 className="welcome__title">{t('Your AI English coach, ready whenever you are.')}</h1>
+                <div className="welcome__points">
+                  {POINTS.map((point) => {
+                    const Icon = point.icon;
+                    return (
+                      <div key={point.text} className="welcome__point">
+                        <span className="welcome__point-icon">
+                          <Icon aria-hidden="true" />
+                        </span>
+                        <span>{t(point.text)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+
+            {step === 2 && (
+              <motion.div
+                key="mode"
+                className="welcome__card"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <div>
+                  <p className="eyebrow">{t('Your progress')}</p>
+                  <h1 className="welcome__title mt-2">{t('How would you like to use botdanna?')}</h1>
+                </div>
+                <div className="mode-grid" role="radiogroup" aria-label={t('How you use botdanna')}>
+                  <button role="radio" aria-checked={choice === 'device'} className="mode-card" onClick={() => setChoice('device')}>
+                    <span className="mode-card__icon">
+                      <Laptop aria-hidden="true" />
+                    </span>
+                    <span className="mode-card__title">{t('On this device')}</span>
+                    <span className="mode-card__text">{t('No account needed. Everything stays here.')}</span>
+                    <span className="mode-card__tick">{choice === 'device' && <Check aria-hidden="true" />}</span>
+                  </button>
+                  <button
+                    role="radio"
+                    aria-checked={choice === 'account'}
+                    className="mode-card"
+                    disabled={!online}
+                    onClick={() => setChoice('account')}
+                  >
+                    <span className="mode-card__icon">
+                      <Cloud aria-hidden="true" />
+                    </span>
+                    <span className="mode-card__title">{t('Online account')}</span>
+                    <span className="mode-card__text">
+                      {online ? t('Sync your chats and files across your devices.') : t('Not available yet.')}
+                    </span>
+                    <span className="mode-card__tick">{choice === 'account' && <Check aria-hidden="true" />}</span>
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <div className="welcome__footer">
+        <div className="welcome__bar">
+          {step === 0 ? (
+            // The first step has no Back, so the Continue button stays on the right.
+            <span aria-hidden="true" />
+          ) : (
+            <button className="btn btn--ghost" onClick={() => setStep(step - 1)}>
+              <ArrowLeft /> {t('Back')}
+            </button>
+          )}
+          {step < 2 ? (
+            <button className="btn btn--primary" onClick={() => setStep(step + 1)}>
+              {t('Continue')} <ArrowRight />
+            </button>
+          ) : (
+            <button className="btn btn--primary" disabled={!choice} onClick={finish}>
+              {t('Continue')} <ArrowRight />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,1857 @@
+/* The shared look of every screen: page headers, sections, feature cards, badges, tabs, the chat
+   input and the spacing scale. Loaded last, so it sets these parts in one place. */
+@layer system {
+  :root {
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-7: 32px;
+  }
+
+  /* ---------- Page header: eyebrow, title, and actions on the right. Same place on every page. ---------- */
+  .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+  }
+
+  /* The text column takes the free width, so the progress bar under a title spans the header like the page. */
+  .page-header__main {
+    display: grid;
+    gap: var(--space-1);
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* ---------- Small pieces that screens used to style inline, so every one is styled in one place ---------- */
+  .brand-mark {
+    display: block;
+    flex: none;
+  }
+
+  .avatar__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+    display: block;
+  }
+
+  .splash-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* Opacity only: the page fades in and nothing moves, so the content can mount without a frame drop. */
+  .shell__page {
+    min-height: 100%;
+    height: 100%;
+    animation: page-in 0.2s ease-out both;
+  }
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .shell__page {
+      animation: none;
+    }
+  }
+
+  .feedback-line--good {
+    color: var(--green);
+  }
+
+  .feedback-line--partial {
+    color: var(--amber-ink);
+  }
+
+  .feedback-line--bad {
+    color: var(--red);
+  }
+
+  .feedback-line--idle {
+    color: var(--ink-2);
+  }
+
+  .option__mark--correct {
+    color: var(--green);
+  }
+
+  .option__mark--wrong {
+    color: var(--red);
+  }
+
+  .answer-key {
+    color: var(--ink);
+    font-weight: 650;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .audio-player {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .banner__body--dots {
+    padding-bottom: 30px;
+  }
+
+  .page-header__aside {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: none;
+  }
+
+  .page-title {
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  /* ---------- Sections inside a page ---------- */
+  .section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin: var(--space-7) 0 var(--space-3);
+  }
+
+  .section-title:first-child {
+    margin-top: 0;
+  }
+
+  .section-title h2 {
+    font-size: 22px;
+  }
+
+  .section-title__aside {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: none;
+  }
+
+  /* ---------- Back link on sub-pages ---------- */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    font-size: 14px;
+    font-weight: 650;
+    color: var(--primary);
+  }
+
+  .back-link svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .back-link:hover {
+    color: var(--primary-700);
+  }
+
+  /* ---------- Badges: status labels, always the same size and case ---------- */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: var(--radius-pill);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .badge--neutral {
+    color: var(--muted);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+  }
+
+  .badge--done {
+    color: var(--green);
+    background: var(--green-50);
+  }
+
+  .badge--beta {
+    color: #fff;
+    background: var(--primary);
+  }
+
+  /* ---------- Feature cards: one card for a setup, a test, a library, a score ---------- */
+  .feature-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    width: 100%;
+    padding: var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--canvas);
+    box-shadow: var(--shadow-sm);
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  }
+
+  .feature-card--muted {
+    background: var(--surface-2);
+    box-shadow: none;
+  }
+
+  /* The overall report in the profile: its stats, its skill bars, and its strengths and weaknesses. */
+  .report-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .report-stat {
+    display: grid;
+    gap: 4px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+
+  .report-stat__label {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .report-stat__value {
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .report-skills {
+    display: grid;
+    gap: 12px;
+  }
+
+  .report-skill {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .report-skill__name {
+    overflow: hidden;
+    color: var(--ink);
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .report-skill__bar {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .report-skill__bar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--primary);
+  }
+
+  .report-skill__score {
+    min-width: 110px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+
+  .report-list {
+    display: grid;
+    gap: 6px;
+    margin: 8px 0 0;
+    padding-left: 18px;
+  }
+
+  /* The level report on Today, with a small button in its corner that removes it for good. */
+  .level-report {
+    position: relative;
+  }
+
+  .level-report .feature-card {
+    height: 100%;
+    padding-right: 44px;
+  }
+
+  .level-report__remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    color: var(--muted);
+  }
+
+  .level-report__remove:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .level-report__remove svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .feature-card--link {
+    cursor: pointer;
+  }
+
+  .feature-card--link:hover {
+    border-color: var(--primary-100);
+    box-shadow: var(--shadow);
+  }
+
+  .feature-card--link:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  .feature-card__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius);
+    color: var(--primary);
+    background: var(--primary-50);
+  }
+
+  .feature-card__icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .feature-card--muted .feature-card__icon {
+    color: var(--ink-2);
+    background: var(--canvas);
+  }
+
+  .feature-card__body {
+    display: grid;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .feature-card__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--ink);
+  }
+
+  .feature-card__meta {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--muted);
+  }
+
+  .feature-card__arrow {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    color: var(--muted);
+  }
+
+  /* ---------- Tabs: counts are neutral; red is only for things waiting for you ---------- */
+  .segmented__count {
+    color: var(--ink-2);
+    background: #e7ebf3;
+  }
+
+  .segmented__count--alert {
+    color: #fff;
+    background: var(--red);
+  }
+
+  /* ---------- Chat input: the coach, and the coach in My library ---------- */
+  .chat-input {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius-lg);
+    background: var(--canvas);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .chat-input:focus-within {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-50);
+  }
+
+  .chat-input textarea,
+  .chat-input input {
+    flex: 1;
+    min-width: 0;
+    padding: var(--space-2) var(--space-2);
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+    resize: none;
+  }
+
+  .chat-input textarea::placeholder,
+  .chat-input input::placeholder {
+    color: var(--muted);
+  }
+
+  /* The send arrow is white on the blue button. The icon button rule sets a dark colour, so this one is more specific. */
+  .chat-input .btn--primary {
+    color: #fff;
+  }
+
+  /* An empty message disables the send button. Its hover colour must not turn it pale: it keeps the blue. */
+  .chat-input .btn--primary:disabled,
+  .chat-input .btn--primary:disabled:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+
+  /* ---------- The volume of the listening voice ---------- */
+  .volume {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .volume__label,
+  .volume__value {
+    flex: 0 0 auto;
+    color: var(--ink-2);
+    font-size: 14px;
+  }
+
+  .volume__value {
+    min-width: 3.25em;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .volume input[type='range'] {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--primary);
+  }
+
+  /* ---------- Coach messages, their files, and the files waiting to be sent ---------- */
+  .message {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 78%;
+  }
+
+  .message--user {
+    align-self: flex-end;
+    align-items: flex-end;
+  }
+
+  .message--coach {
+    align-self: flex-start;
+    align-items: flex-start;
+  }
+
+  .message .bubble {
+    max-width: 100%;
+  }
+
+  .message__files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .message--user .message__files {
+    justify-content: flex-end;
+  }
+
+  /* ---------- Coach replies: the text as Markdown, exercises, quick replies and read aloud ---------- */
+  .message--wide {
+    max-width: min(94%, 680px);
+  }
+
+  .bubble--rich {
+    white-space: normal;
+  }
+
+  .bubble--rich > :first-child {
+    margin-top: 0;
+  }
+
+  .bubble--rich > :last-child {
+    margin-bottom: 0;
+  }
+
+  .bubble--rich p {
+    margin: 0 0 8px;
+  }
+
+  .bubble--rich ul,
+  .bubble--rich ol {
+    margin: 0 0 8px;
+    padding-left: 20px;
+  }
+
+  .bubble--rich strong {
+    font-weight: 600;
+  }
+
+  .exercise {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--canvas);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .exercise__title {
+    margin: 0 0 10px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .exercise__list {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .exercise__item {
+    display: grid;
+    gap: 8px;
+  }
+
+  .exercise__prompt {
+    margin: 0;
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .exercise__options {
+    display: grid;
+    gap: 6px;
+  }
+
+  .exercise__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    background: var(--canvas);
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+
+  .exercise__option:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: var(--surface-2);
+  }
+
+  .exercise__option:disabled {
+    cursor: default;
+  }
+
+  .exercise__option.is-selected {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-50);
+  }
+
+  .exercise__option.is-right {
+    border-color: var(--green);
+    background: rgba(22, 163, 116, 0.1);
+  }
+
+  .exercise__option.is-wrong {
+    border-color: var(--red);
+    background: rgba(229, 72, 77, 0.08);
+  }
+
+  .exercise__option svg {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    margin-left: auto;
+  }
+
+  .exercise__option.is-right svg {
+    color: var(--green);
+  }
+
+  .exercise__option.is-wrong svg {
+    color: var(--red);
+  }
+
+  .exercise__letter {
+    display: inline-grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .exercise__blank {
+    min-width: 4ch;
+    margin: 0 4px;
+    padding: 2px 8px;
+    border: 0;
+    border-bottom: 2px solid var(--primary);
+    border-radius: 4px 4px 0 0;
+    background: var(--surface-2);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 600;
+    outline: 0;
+  }
+
+  .exercise__blank:focus {
+    background: var(--primary-50);
+  }
+
+  .exercise__blank:disabled {
+    opacity: 1;
+  }
+
+  .exercise__blank.is-right {
+    border-bottom-color: var(--green);
+    background: rgba(22, 163, 116, 0.12);
+    color: #0b7a55;
+  }
+
+  .exercise__blank.is-wrong {
+    border-bottom-color: var(--red);
+    background: rgba(229, 72, 77, 0.08);
+    color: var(--red);
+  }
+
+  .exercise__hint summary {
+    color: var(--primary);
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .exercise__hint p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .exercise__answer,
+  .exercise__explain {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+
+  .exercise__text {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--line-2);
+    border-radius: var(--radius);
+    background: var(--canvas);
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    resize: vertical;
+  }
+
+  .exercise__text:focus {
+    outline: 0;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-50);
+  }
+
+  .exercise__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+
+  .exercise__score {
+    margin: 0;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .exercise__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .suggest--replies {
+    margin-top: 2px;
+  }
+
+  .read-aloud {
+    margin-top: -2px;
+  }
+
+  .file-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 260px;
+    min-height: 30px;
+    padding: 3px 8px 3px 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .file-chip > svg {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    color: var(--muted);
+  }
+
+  .file-chip--library {
+    border-color: var(--primary-100);
+    background: var(--primary-50);
+    color: var(--primary-700);
+  }
+
+  .file-chip--library > svg {
+    color: var(--primary-700);
+  }
+
+  .file-chip--busy {
+    color: var(--muted);
+  }
+
+  /* A file in a sent message: the same chip, on the page's own background. */
+  .file-chip--static {
+    background: var(--canvas);
+  }
+
+  .file-chip__thumb {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    object-fit: cover;
+  }
+
+  .file-chip__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .file-chip__remove {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    margin-right: -4px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .file-chip__remove:hover {
+    background: var(--line);
+    color: var(--ink);
+  }
+
+  .file-chip__remove > svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .composer-files {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .composer-files__count {
+    margin-left: auto;
+  }
+
+  .coach__composer.is-over .chat-input {
+    border-style: dashed;
+    border-color: var(--primary);
+    background: var(--primary-50);
+  }
+
+  /* ---------- Chat history: the chats, grouped, with their actions ---------- */
+  /* Each grid has one column that can shrink, so a long chat title is cut short instead of pushing the buttons out. */
+  .chat-groups {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    margin-top: 14px;
+  }
+
+  .show-more {
+    margin-top: 8px;
+  }
+
+  .chat-group__title {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .chat-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chat-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 6px 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+  }
+
+  .chat-row:hover {
+    background: var(--surface-2);
+  }
+
+  .chat-row.is-active {
+    border-color: var(--primary-100);
+    background: var(--primary-50);
+  }
+
+  .chat-row__open {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    flex: 1;
+    min-width: 0;
+    gap: 2px;
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .chat-row__open:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .chat-row__title {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chat-row__meta {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .chat-row__actions {
+    display: flex;
+    flex: none;
+    gap: 2px;
+  }
+
+  .chat-row__edit {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .chat-row__edit .input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ---------- Mention picker: the library files a message can carry ---------- */
+  .mention-list {
+    display: grid;
+    gap: 6px;
+    max-height: 320px;
+    margin: 12px 0 0;
+    padding: 0;
+    overflow-y: auto;
+    list-style: none;
+  }
+
+  .mention-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--canvas);
+    cursor: pointer;
+  }
+
+  .mention-option.is-on {
+    border-color: var(--primary);
+    background: var(--primary-50);
+  }
+
+  .mention-option input {
+    flex: none;
+    accent-color: var(--primary);
+  }
+
+  .mention-option__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mention-option__kind {
+    flex: none;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  /* ---------- Input with its action on the same row ---------- */
+  .input-action {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .input-action > :first-child {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ---------- Spacing utilities for the few places a margin is needed ---------- */
+  .mt-3 { margin-top: var(--space-3); }
+  .mt-4 { margin-top: var(--space-4); }
+  .mt-5 { margin-top: var(--space-5); }
+  .mt-6 { margin-top: var(--space-6); }
+  .mt-7 { margin-top: var(--space-7); }
+  .mb-2 { margin-bottom: var(--space-2); }
+  .mb-3 { margin-bottom: var(--space-3); }
+  .mb-4 { margin-bottom: var(--space-4); }
+
+  /* ---------- Section cards on self study: the artwork sits behind the text ---------- */
+  .section-card__art {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.95;
+    transition: transform 0.6s var(--ease);
+  }
+
+  .section-card:hover .section-card__art {
+    transform: scale(1.03);
+  }
+
+  /* ---------- Lesson stars: filled ones are amber, empty ones stay quiet ---------- */
+  .set-row__stars {
+    display: inline-flex;
+    gap: 2px;
+    flex: none;
+    color: var(--line-2);
+  }
+
+  .set-row__stars .is-on {
+    color: var(--amber);
+  }
+
+  /* ---------- Hero: the eyebrow and title read on the blue panel ---------- */
+  .hero .eyebrow {
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .hero__title {
+    margin-top: var(--space-1);
+  }
+
+  /* ---------- Rows that show something but do not open ---------- */
+  .set-row--static,
+  .set-row--static:hover {
+    cursor: default;
+    transform: none;
+    border-color: var(--line);
+  }
+
+  .set-row__when {
+    flex: none;
+    font-size: 13px;
+    white-space: nowrap;
+    color: var(--muted);
+  }
+
+  /* ---------- Roadmap: the text beside a unit badge, and the line under a node label ---------- */
+  .unit__text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .node__meta {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  /* ---------- Rows: the title and its detail each take their own line ---------- */
+  .set-row__title,
+  .set-row__meta {
+    display: block;
+  }
+
+  /* ---------- Section cards: the kicker, title and stats each take their own line ---------- */
+  .section-card__kicker,
+  .section-card__title,
+  .section-card__stats {
+    display: block;
+  }
+
+  /* ---------- A small label above a group in a list (not a form label) ---------- */
+  .group-label {
+    font-size: 13px;
+    font-weight: 650;
+    color: var(--muted);
+  }
+
+  /* ---------- Search field: the icon sits inside the left edge of the input ---------- */
+  .search-field {
+    position: relative;
+    display: block;
+  }
+
+  .search-field > svg {
+    position: absolute;
+    left: var(--space-4);
+    top: 50%;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  .search-field .input {
+    padding-left: 42px;
+    padding-right: 44px;
+  }
+
+  /* The browser's own clear mark is hidden: the search field has its own clear button, in the app's style. */
+  .search-field input[type='search']::-webkit-search-cancel-button,
+  .search-field input[type='search']::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+  }
+
+  .search-field__clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+  }
+
+  .search-field__clear:hover {
+    background: var(--primary-50);
+    color: var(--primary-700);
+  }
+
+  .search-field__clear:focus-visible {
+    outline: 2px solid var(--primary-100);
+    outline-offset: 1px;
+  }
+
+  .search-field__clear svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  /* ---------- The search of the whole app: a panel under the title bar, with the results in groups ---------- */
+  .palette-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: grid;
+    justify-items: center;
+    align-items: start;
+    padding: 64px 24px 24px;
+    background: rgba(15, 27, 51, 0.28);
+  }
+
+  .palette {
+    width: min(640px, 100%);
+    max-height: calc(100vh - 88px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    background: var(--canvas);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .palette__body {
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .palette__hint {
+    margin: 0;
+    padding: 14px 6px;
+  }
+
+  .palette__list {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .palette__group {
+    padding: 10px 10px 4px;
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .palette__item {
+    display: grid;
+    gap: 2px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .palette__item.is-active {
+    background: var(--primary-50);
+  }
+
+  .palette__title {
+    font-weight: 650;
+    color: var(--ink);
+  }
+
+  .palette__detail {
+    overflow: hidden;
+    font-size: 13px;
+    color: var(--muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .palette__foot {
+    margin: 0;
+    padding: 0 4px;
+  }
+
+  /* ---------- The profile: a rounded hero with the banner behind the name, the picture and the stat cards ---------- */
+  .profile-hero {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    min-height: 300px;
+    margin-top: 8px;
+    padding: 26px 28px 24px;
+    overflow: hidden;
+    border-radius: 24px;
+    color: #fff;
+    box-shadow: 0 22px 44px -26px rgba(20, 36, 107, 0.6);
+  }
+
+  .profile-hero__backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-color: #1d3580;
+    background-image:
+      radial-gradient(circle at 88% 14%, rgba(255, 255, 255, 0.22), transparent 36%),
+      radial-gradient(circle at 6% 110%, rgba(255, 255, 255, 0.14), transparent 44%),
+      linear-gradient(135deg, #1d1466 0%, #5337d2 100%);
+    background-size: cover;
+    background-position: center;
+  }
+
+  .profile-hero__backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(8, 14, 36, 0.12) 0%, rgba(8, 14, 36, 0.72) 100%);
+  }
+
+  .profile-hero__banner-edit {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+
+  .profile-hero__banner-edit:hover {
+    background: rgba(255, 255, 255, 0.26);
+  }
+
+  .profile-hero__banner-edit svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .profile-hero__top {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 28px;
+    padding-top: 42px;
+  }
+
+  .profile-hero__who {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .profile-hero__eyebrow {
+    margin: 0 0 6px;
+    font-size: 12px;
+    font-weight: 750;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .profile-hero__name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .profile-hero__title {
+    margin: 0;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 36px;
+    font-weight: 780;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: #fff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .profile-hero__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .profile-hero__icon:hover {
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  .profile-hero__icon svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .profile-hero__meta {
+    margin: 6px 0 16px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.84);
+  }
+
+  .profile-hero__level {
+    max-width: 440px;
+  }
+
+  .profile-hero__level .level-row span {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  .profile-hero__picture {
+    position: relative;
+    flex: none;
+  }
+
+  .profile-hero__picture .avatar {
+    width: 124px;
+    height: 124px;
+    font-size: 42px;
+    border: 4px solid rgba(255, 255, 255, 0.96);
+    box-shadow: 0 18px 36px -14px rgba(4, 10, 30, 0.6);
+  }
+
+  .profile-hero__picture-edit {
+    position: absolute;
+    right: -2px;
+    bottom: 4px;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: #fff;
+    color: #1e3a8a;
+    box-shadow: 0 8px 18px -6px rgba(4, 10, 30, 0.5);
+    cursor: pointer;
+  }
+
+  .profile-hero__picture-edit:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .profile-hero__picture-edit svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .profile-hero__stats {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: auto;
+  }
+
+  .profile-hero__stat {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+    padding: 16px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .profile-hero__value {
+    font-size: 28px;
+    font-weight: 760;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+  }
+
+  .profile-hero__label {
+    font-size: 13px;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  @media (max-width: 760px) {
+    .profile-hero__stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .profile-hero__top {
+      flex-direction: column-reverse;
+    }
+  }
+
+  /* The pictures in the profile dialogs: the current picture, and the banner preview. */
+  .picture-preview {
+    display: grid;
+    place-items: center;
+    padding: 6px 0;
+  }
+
+  .picture-preview .avatar {
+    width: 128px;
+    height: 128px;
+    font-size: 44px;
+  }
+
+  .banner-preview {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 10 / 3;
+    overflow: hidden;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #1d1466 0%, #5337d2 100%) center / cover no-repeat;
+    color: #fff;
+    font-weight: 650;
+  }
+
+  .banner-preview span {
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(8, 14, 36, 0.4);
+    font-size: 13px;
+  }
+
+  /* A friend's profile: the banner, the picture on it, the streak, and what the friend shared with you. */
+  .friend-profile {
+    display: grid;
+    gap: 16px;
+  }
+
+  .friend-profile__banner {
+    height: 132px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #1d1466 0%, #5337d2 100%) center / cover no-repeat;
+  }
+
+  .friend-profile__banner--plain {
+    background-image:
+      radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.25), transparent 40%),
+      linear-gradient(135deg, #1d1466 0%, #5337d2 100%);
+  }
+
+  .friend-profile__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px;
+    margin-top: -58px;
+    padding: 0 12px;
+  }
+
+  .friend-profile__picture .avatar {
+    width: 96px;
+    height: 96px;
+    font-size: 34px;
+    border: 4px solid var(--canvas);
+    box-shadow: 0 10px 24px -12px rgba(15, 27, 51, 0.5);
+  }
+
+  .friend-profile__who {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: 4px;
+  }
+
+  .friend-profile__name {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 750;
+  }
+
+  .friend-profile__streak {
+    padding-bottom: 6px;
+  }
+
+  /* A friend in the list opens their profile when pressed. */
+  .person__main {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+    gap: 14px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .person__main:focus-visible {
+    outline: 2px solid var(--primary-100);
+    outline-offset: 4px;
+    border-radius: 12px;
+  }
+
+  /* ---------- Quiet text buttons, such as Remove or Remove picture ---------- */
+  .btn--text-muted {
+    color: var(--muted);
+  }
+
+  .btn--text-muted:hover {
+    color: var(--red);
+  }
+
+  /* ---------- People rows: rank, the signed-in person, and streak ---------- */
+  .person--me {
+    border-color: var(--primary-100);
+    background: var(--primary-50);
+  }
+
+  .person__rank {
+    flex: none;
+    width: 22px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .person__streak {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .person__streak svg {
+    width: 14px;
+    height: 14px;
+    color: #e6822c;
+  }
+
+  /* ---------- Profile head and level ---------- */
+  .profile-head__picture {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .profile-head__avatar {
+    position: relative;
+    width: fit-content;
+  }
+
+  /* A small camera button on the picture's corner, instead of a large button under it. */
+  .profile-head__camera {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line-2);
+    border-radius: 50%;
+    background: var(--canvas);
+    color: var(--ink-2);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition:
+      border-color 0.15s var(--ease),
+      color 0.15s var(--ease);
+  }
+
+  .profile-head__camera:hover:not(:disabled) {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  .profile-head__camera:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .profile-head__camera svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .profile-head__remove {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--muted);
+    font-size: 13px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .profile-head__remove:hover:not(:disabled) {
+    color: var(--red);
+  }
+
+  .profile-head__remove:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .profile-head__main {
+    display: grid;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .profile-head__level {
+    max-width: 380px;
+    margin-top: var(--space-3);
+  }
+
+  .level-row {
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* ---------- Settings and forms ---------- */
+  .row--wrap {
+    flex-wrap: wrap;
+  }
+
+  .connection__name {
+    font-weight: 650;
+  }
+
+  .model__label {
+    flex: 1;
+    min-width: 0;
+    font-weight: 620;
+  }
+
+  /* ---------- Voices: the listening choices in Settings, each with a button to hear it first ---------- */
+  .voice-group__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .voice-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .voice-row__choice {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .voice-row__listen {
+    flex: none;
+  }
+
+  .voice-row__meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .voice-row__choice:disabled,
+  .voice-row__listen:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  /* ---------- Layout helpers used by the first-run flow and the report ---------- */
+  .mt-2 { margin-top: var(--space-2); }
+  .pb-3 { padding-bottom: var(--space-3); }
+  .text-center { text-align: center; }
+  .self-start { align-self: flex-start; }
+  .stack--loose {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .stack--center { align-items: center; }
+
+  /* ---------- Wizard steps: the same heading block on every step ---------- */
+  .step-head {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  /* ---------- Tabs across the full width of a card ---------- */
+  .segmented--block {
+    display: flex;
+    width: 100%;
+  }
+
+  .segmented--block .segmented__btn {
+    flex: 1;
+  }
+
+  /* ---------- A line with a word in the middle, such as "or" ---------- */
+  .divider-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .divider {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* ---------- Report: the hero text and the advice paragraph ---------- */
+  .report-hero .eyebrow {
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  .report-hero__title {
+    margin-top: var(--space-1);
+  }
+
+  .advice__body {
+    font-size: 15.5px;
+    line-height: 1.75;
+    color: var(--ink-2);
+  }
+
+  /* ---------- Share sheet: the item that is picked ---------- */
+  .set-row--picked {
+    border-color: var(--primary);
+    background: var(--primary-50);
+  }
+
+  /* ---------- Session runner: the question count, errors, stars and the skill summary ---------- */
+  .runner__count {
+    font-weight: 600;
+  }
+
+  .text-red {
+    color: var(--red);
+  }
+
+  .stars > span {
+    display: inline-flex;
+  }
+
+  .skill-summary .plan__row {
+    font-size: 14px;
+  }
+
+  .skill-summary__name {
+    flex: none;
+    width: 92px;
+  }
+
+  .skill-summary__bar {
+    flex: 1;
+  }
+
+  .row--center {
+    justify-content: center;
+  }
+
+  /* ---------- What's new: the text of a release note ---------- */
+  .release__text {
+    color: var(--ink-2);
+  }
+}

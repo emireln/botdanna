@@ -1,0 +1,290 @@
+// The data contract shared by the online backend and the offline backend
+// (this device only). Screens depend only on this file.
+import type {
+  AnnouncementRow,
+  AttemptKind,
+  AttemptRow,
+  FriendRow,
+  LessonProgressRow,
+  PersonRow,
+  ProfileRow,
+  ReviewRow,
+  ShareRow,
+  Skill,
+  TestContent,
+  TestRow,
+  TutorAttachment,
+  TutorChatRow,
+  TutorRow,
+  LibraryFileRow,
+  LibraryKind,
+  LibraryLinkRow,
+  AiKeyRow,
+  LeagueRow,
+  Provider,
+  DeckColour,
+  CardRow,
+  CardState,
+  DeckRow,
+} from '../types';
+
+export type BackendMode = 'supabase' | 'local';
+
+export interface NewAttempt {
+  id?: string;
+  created_at?: string;
+  kind: AttemptKind;
+  ref_id: string;
+  title: string;
+  score_pct: number;
+  predicted: number | null;
+  skills: AttemptRow['skills'];
+  answers: AttemptRow['answers'];
+  duration_s: number;
+  /** The XP this run earned. The weekly league counts it. Zero when the caller does not know it. */
+  xp?: number;
+}
+
+export interface NewTest {
+  id?: string;
+  created_at?: string;
+  title: string;
+  description: string;
+  kind: TestRow['kind'];
+  skill: TestRow['skill'];
+  level: TestRow['level'];
+  minutes: number;
+  content: TestContent;
+}
+
+export type ProfilePatch = Partial<
+  Pick<
+    ProfileRow,
+    | 'username'
+    | 'display_name'
+    | 'avatar_color'
+    | 'goal'
+    | 'target_score'
+    | 'exam_date'
+    | 'exam_name'
+    | 'exam_paused'
+    | 'daily_minutes'
+    | 'level'
+    | 'xp'
+    | 'streak'
+    | 'last_active'
+    | 'onboarding_done'
+    | 'ai_salt'
+    | 'ui_style'
+  >
+>;
+
+export interface SharePayload {
+  recipientId: string;
+  kind: 'result' | 'test';
+  attemptId?: string;
+  testId?: string;
+  note: string;
+}
+
+export interface NewLibraryFile {
+  id?: string;
+  created_at?: string;
+  name: string;
+  kind: LibraryKind;
+  mime_type: string;
+  /** The file's bytes. */
+  blob: Blob;
+  /** The text read from the file. The tutor uses it. */
+  extracted_text: string;
+  pages: number | null;
+}
+
+/** New text for a TXT or Markdown file in the library. The file keeps its name, kind and place. */
+export interface LibraryFileUpdate {
+  /** The whole text, as the file's bytes. */
+  blob: Blob;
+  /** The text the tutor reads: the start of the text. */
+  extracted_text: string;
+}
+
+export interface NewLibraryLink {
+  id?: string;
+  created_at?: string;
+  url: string;
+  title: string;
+  platform: string;
+  category: string;
+  note: string;
+}
+
+export interface LibraryLinkPatch {
+  title?: string;
+  category?: string;
+  note?: string;
+}
+
+/** A feedback message from the account: a rating of 1 to 5 stars, an optional comment and the app version. */
+export interface NewFeedback {
+  rating: number;
+  comment: string;
+  app_version: string;
+}
+
+/** A new deck: its title, an optional description and its colour. */
+export interface NewDeck {
+  id?: string;
+  created_at?: string;
+  title: string;
+  description: string;
+  colour: DeckColour;
+}
+
+export interface DeckPatch {
+  title?: string;
+  description?: string;
+  colour?: DeckColour;
+}
+
+/** A new card. Its review state starts as new, and it is due at once unless a time is given. */
+export interface NewCard {
+  id?: string;
+  created_at?: string;
+  due_at?: string;
+  front: string;
+  back: string;
+  note: string;
+}
+
+/** A change to a card: its text, or its review state after a grade. */
+export interface CardPatch {
+  front?: string;
+  back?: string;
+  note?: string;
+  state?: CardState;
+  ease?: number;
+  interval_days?: number;
+  reps?: number;
+  lapses?: number;
+  due_at?: string;
+  last_review_at?: string | null;
+}
+
+export interface DataBackend {
+  readonly mode: BackendMode;
+
+  /** The account's AI keys, sealed. Only the signed-in owner can read them. Online accounts only. */
+  listAiKeys(): Promise<AiKeyRow[]>;
+  /** Saves a sealed key, replacing the one for the same provider. */
+  saveAiKey(row: { provider: Provider; sealed: string; masked: string }): Promise<void>;
+  deleteAiKey(provider: Provider): Promise<void>;
+  /** Sends a feedback message from the signed-in account. Online accounts only. */
+  sendFeedback(input: NewFeedback): Promise<void>;
+  /** Seconds the account must still wait before its next feedback message: 0 when it may send now. Online accounts only. */
+  feedbackWaitSeconds(): Promise<number>;
+  getProfile(): Promise<ProfileRow | null>;
+  updateProfile(patch: ProfilePatch): Promise<ProfileRow>;
+
+  /** The person's own picture as WebP, or null. Its version is profile.avatar_updated_at. */
+  getAvatar(): Promise<Blob | null>;
+  /** Saves a WebP picture, or removes it with null. Returns the updated profile. */
+  setAvatar(picture: Blob | null): Promise<ProfileRow>;
+  /** A friend's picture by its storage path. Online accounts only. */
+  fetchAvatar(path: string): Promise<Blob | null>;
+  /** The person's own banner as WebP, or null. Its version is profile.banner_updated_at. */
+  getBanner(): Promise<Blob | null>;
+  /** Saves a WebP banner, or removes it with null. */
+  setBanner(picture: Blob | null): Promise<ProfileRow>;
+  /** A friend's banner, at the path the friends list gives. */
+  fetchBanner(path: string): Promise<Blob | null>;
+
+  /** The newest attempts first, optionally only one kind of attempt. */
+  listAttempts(limit?: number, kind?: AttemptKind): Promise<AttemptRow[]>;
+  /** How many attempts of one kind exist, whatever the page size. */
+  countAttempts(kind: AttemptKind): Promise<number>;
+  getAttempt(id: string): Promise<AttemptRow | null>;
+  insertAttempt(row: NewAttempt): Promise<AttemptRow>;
+
+  getSkillScores(): Promise<Partial<Record<Skill, number>>>;
+  setSkillScores(scores: Partial<Record<Skill, number>>): Promise<void>;
+
+  listLessonProgress(): Promise<LessonProgressRow[]>;
+  upsertLessonProgress(row: LessonProgressRow): Promise<void>;
+  /** Several lessons in one save, all or nothing. Used when the level is set. */
+  upsertLessonProgressMany(rows: LessonProgressRow[]): Promise<void>;
+
+  listReviewItems(): Promise<ReviewRow[]>;
+  upsertReviewItems(rows: ReviewRow[]): Promise<void>;
+
+  listMyTests(): Promise<TestRow[]>;
+  getTest(id: string): Promise<TestRow | null>;
+  insertTest(row: NewTest): Promise<TestRow>;
+
+  listFriends(): Promise<FriendRow[]>;
+  searchPeople(query: string): Promise<PersonRow[]>;
+  requestFriend(userId: string): Promise<void>;
+  /** accept = true accepts a request; false removes a request or friendship. */
+  answerFriend(friendshipId: string, accept: boolean): Promise<void>;
+
+  listShares(): Promise<ShareRow[]>;
+  sendShare(payload: SharePayload): Promise<void>;
+  markSharesSeen(): Promise<void>;
+
+  /** The XP of the last days for the caller and, online, for their accepted friends. Offline it is the caller alone. */
+  listLeague(days: number): Promise<LeagueRow[]>;
+
+  /** The decks of the account, newest first. */
+  listDecks(): Promise<DeckRow[]>;
+  createDeck(input: NewDeck): Promise<DeckRow>;
+  updateDeck(id: string, patch: DeckPatch): Promise<DeckRow>;
+  /** Deletes a deck and every card in it. */
+  deleteDeck(id: string): Promise<void>;
+  /** The cards of one deck, oldest first. */
+  listCards(deckId: string): Promise<CardRow[]>;
+  /** Adds cards to a deck, all or nothing. At most 500 at a time. */
+  createCards(deckId: string, rows: NewCard[]): Promise<CardRow[]>;
+  updateCard(id: string, patch: CardPatch): Promise<CardRow>;
+  deleteCard(id: string): Promise<void>;
+  /** The cards due at or before the given time, the earliest due first. */
+  listDueCards(now: string, limit: number): Promise<CardRow[]>;
+
+  listAnnouncements(): Promise<AnnouncementRow[]>;
+
+  listLibraryFiles(): Promise<LibraryFileRow[]>;
+  /** The file's bytes for viewing, or null when they are not available. */
+  getLibraryBlob(id: string): Promise<Blob | null>;
+  /** The text read from the file. The tutor uses it. */
+  getLibraryText(id: string): Promise<string>;
+  addLibraryFile(input: NewLibraryFile): Promise<LibraryFileRow>;
+  /** Saves new text for a TXT or Markdown file. A PDF keeps its own pages, so it cannot be changed this way. */
+  updateLibraryFile(id: string, input: LibraryFileUpdate): Promise<LibraryFileRow>;
+  deleteLibraryFile(id: string): Promise<void>;
+
+  listLibraryLinks(): Promise<LibraryLinkRow[]>;
+  addLibraryLink(input: NewLibraryLink): Promise<LibraryLinkRow>;
+  updateLibraryLink(id: string, patch: LibraryLinkPatch): Promise<LibraryLinkRow>;
+  deleteLibraryLink(id: string): Promise<void>;
+
+  /** The coach's chats, newest first. Archived chats are included. */
+  listTutorChats(): Promise<TutorChatRow[]>;
+  /** A new empty chat. record keeps an existing id and time, used when progress is copied between devices and accounts. */
+  createTutorChat(record?: { id?: string; created_at?: string; mode?: string | null }): Promise<TutorChatRow>;
+  /** Renames a chat. An empty title clears its name. */
+  renameTutorChat(id: string, title: string): Promise<TutorChatRow>;
+  setTutorChatArchived(id: string, archived: boolean): Promise<TutorChatRow>;
+  /** Deletes a chat and every message in it. */
+  deleteTutorChat(id: string): Promise<void>;
+  /** The ids of the chats whose name or messages contain the text, without regard to case. */
+  searchTutorChats(query: string): Promise<string[]>;
+  /** The newest messages of one chat, in order. */
+  listTutor(chatId: string, limit?: number): Promise<TutorRow[]>;
+  /** Removes one message, when a reply is written again or a message is edited and sent again. */
+  deleteTutorMessage(id: string): Promise<void>;
+  /** record keeps an existing id and time, used when progress is copied between devices and accounts. */
+  addTutor(
+    chatId: string,
+    role: TutorRow['role'],
+    content: string,
+    record?: { id?: string; created_at?: string; attachments?: TutorAttachment[] },
+  ): Promise<TutorRow>;
+}

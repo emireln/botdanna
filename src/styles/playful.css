@@ -1,0 +1,1397 @@
+/* The Playful look (2.0.0): friendlier and gamified, with chunky 3D controls, bright colours and progress
+   everywhere. Every rule sits under :root[data-look="playful"], so the Classic look is unchanged. The tokens are
+   the ones in docs/v2/DESIGN.md (section 3); tests/look-contrast.test.mjs reads them from this file. */
+@layer looks {
+  :root[data-look='playful'] {
+    --font: 'Nunito Variable', Nunito, 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+    --ink: #1d1a3d;
+    --ink-2: #41406a;
+    --muted: #5d5b7d;
+    --line: #dde3f7;
+    --line-2: #c4cbea;
+    --canvas: #f1f5ff;
+    --canvas-2: #e6edff;
+    --surface-2: #eaf0ff;
+
+    --primary: #5337d2;
+    --primary-600: #4429b8;
+    --primary-700: #3a2693;
+    --primary-50: #efeaff;
+    --primary-100: #dcd2ff;
+
+    --blue: #1566d6;
+    --blue-edge: #0f4fa3;
+    --blue-50: #e8f1ff;
+
+    --violet: #5b3fd9;
+    --violet-edge: #3f27b0;
+    --violet-50: #efeaff;
+    --violet-100: #dcd2ff;
+
+    --hero-a: #3d24b5;
+    --hero-b: #6a4bef;
+    --mint: #7ef3c2;
+
+    --sun: #ffc62b;
+    --sun-edge: #d89b00;
+    --sun-ink: #3d2b00;
+
+    --red: #d9363e;
+    --red-edge: #a8232b;
+    --red-ink: #b42318;
+    --red-50: #fdecec;
+
+    --green: #12803c;
+    --green-50: #e8f8ee;
+    --green-edge: #0b5a2a;
+    --teal: #0f8f86;
+    --amber: #ffc62b;
+    --amber-ink: #8a5a00;
+    --slate: #9aa3c4;
+
+    --radius-sm: 10px;
+    --radius: 16px;
+    --radius-lg: 22px;
+
+    --shadow-sm: 0 2px 0 var(--line-2);
+    --shadow: 0 4px 0 var(--line-2);
+    --shadow-lift: 0 6px 0 var(--line-2), 0 18px 30px -18px rgba(29, 26, 61, 0.35);
+  }
+
+  /* Headings and eyebrows: heavy, with the uppercase labels Duolingo and Talkpal use for sections. */
+  :root[data-look='playful'] h1,
+  :root[data-look='playful'] h2 {
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  :root[data-look='playful'] .eyebrow {
+    color: var(--violet);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* On the violet hero and the banners the eyebrow takes the mint highlight, so it still reads. */
+  :root[data-look='playful'] .hero .eyebrow,
+  :root[data-look='playful'] .hero__meta,
+  :root[data-look='playful'] .banner .eyebrow {
+    color: var(--mint);
+  }
+
+  /* 3D buttons: a bottom edge, and the press sinks the button into the page. */
+  :root[data-look='playful'] .btn {
+    height: 48px;
+    border-radius: var(--radius);
+    font-weight: 800;
+    transition:
+      transform 80ms ease,
+      box-shadow 80ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease,
+      opacity 150ms ease;
+  }
+
+  :root[data-look='playful'] .btn--sm {
+    height: 40px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+
+  :root[data-look='playful'] .btn--icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  :root[data-look='playful'] .btn:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+
+  :root[data-look='playful'] .btn--primary {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 0 var(--primary-700);
+  }
+
+  :root[data-look='playful'] .btn--primary:hover:not(:disabled) {
+    background: var(--primary-600);
+  }
+
+  :root[data-look='playful'] .btn--coffee {
+    background: var(--sun);
+    border-color: transparent;
+    color: var(--sun-ink);
+    box-shadow: 0 4px 0 var(--sun-edge);
+  }
+
+  :root[data-look='playful'] .btn--coffee:hover:not(:disabled) {
+    background: #ffd44f;
+  }
+
+  :root[data-look='playful'] .btn--ghost {
+    background: #ffffff;
+    color: var(--ink);
+    border: 2px solid var(--line-2);
+    box-shadow: 0 4px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .btn--ghost:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  :root[data-look='playful'] .btn--white {
+    background: #ffffff;
+    color: var(--ink);
+    border: 2px solid var(--line-2);
+    box-shadow: 0 4px 0 var(--line-2);
+  }
+
+  /* A white button takes the same tint on hover as the white roadmap nodes and the ghost buttons. */
+  :root[data-look='playful'] .btn--white:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  :root[data-look='playful'] .btn--danger {
+    background: #ffffff;
+    color: var(--red-ink);
+    border: 2px solid #f0c3c0;
+    box-shadow: 0 4px 0 #f0c3c0;
+  }
+
+  :root[data-look='playful'] .btn:disabled {
+    opacity: 1;
+    background: #d5dbef;
+    border-color: transparent;
+    color: #6b6f92;
+    box-shadow: 0 4px 0 #c4cbea;
+  }
+
+  :root[data-look='playful'] .btn:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+  }
+
+  /* Chips: rounded squares, not pills. Pills stay for the segment controls only. */
+  :root[data-look='playful'] .chip {
+    border-width: 2px;
+    border-radius: var(--radius-sm);
+    font-weight: 800;
+  }
+
+  :root[data-look='playful'] .chip--blue {
+    color: var(--blue);
+    background: var(--blue-50);
+    border-color: #c9dcff;
+  }
+
+  :root[data-look='playful'] .chip--ai {
+    color: var(--violet);
+    background: var(--violet-50);
+    border-color: transparent;
+  }
+
+  /* Cards: white, a thick border and a visible bottom edge. Hover lifts them. */
+  :root[data-look='playful'] .card {
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+  }
+
+  /* A card you can press has the tint and the edge of the other buttons on hover, not a lift. */
+  :root[data-look='playful'] .card--hover:hover {
+    transform: none;
+    background: var(--surface-2);
+    box-shadow: var(--shadow);
+    border-color: var(--line-2);
+  }
+
+  :root[data-look='playful'] .card--done {
+    background: #eef1fb;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  :root[data-look='playful'] .feature-card {
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+  }
+
+  :root[data-look='playful'] .feature-card--link:hover {
+    transform: none;
+    background: var(--surface-2);
+    box-shadow: var(--shadow);
+  }
+
+  /* The hero: one per screen, violet, with white text. */
+  :root[data-look='playful'] .hero {
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--hero-a), var(--hero-b));
+  }
+
+  :root[data-look='playful'] .hero__title {
+    font-weight: 900;
+  }
+
+  /* The profile hero in the Playful look: a friendly violet card with a soft shape in the corner, a big avatar with a
+     white ring, the level in a sun chip, and four stat tiles with their own icons. A banner photo still fills the card. */
+  :root[data-look='playful'] .profile-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 26px 26px 24px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, var(--hero-a) 0%, var(--hero-b) 100%);
+    box-shadow: 0 6px 0 #2a1a82;
+  }
+
+  :root[data-look='playful'] .profile-hero::before,
+  :root[data-look='playful'] .profile-hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  :root[data-look='playful'] .profile-hero::before {
+    top: -96px;
+    right: -64px;
+    width: 280px;
+    height: 280px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  :root[data-look='playful'] .profile-hero::after {
+    bottom: -70px;
+    left: 40%;
+    width: 170px;
+    height: 170px;
+    background: rgba(255, 198, 43, 0.14);
+  }
+
+  :root[data-look='playful'] .profile-hero:not(.profile-hero--photo) .profile-hero__backdrop {
+    display: none;
+  }
+
+  :root[data-look='playful'] .profile-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  :root[data-look='playful'] .profile-hero__title {
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  :root[data-look='playful'] .profile-hero__meta {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    margin-top: 8px;
+    padding: 0 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  :root[data-look='playful'] .profile-hero__level .level-row span:first-child {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 10px;
+    border-radius: 10px;
+    background: var(--sun);
+    color: var(--sun-ink);
+    font-weight: 900;
+    box-shadow: 0 3px 0 var(--sun-edge);
+  }
+
+  :root[data-look='playful'] .profile-hero__level .level-row span:last-child {
+    color: #ffffff;
+    font-weight: 800;
+  }
+
+  :root[data-look='playful'] .profile-hero .progress {
+    height: 14px;
+    background: rgba(255, 255, 255, 0.26);
+  }
+
+  :root[data-look='playful'] .profile-hero .progress__bar {
+    background-color: var(--sun);
+    background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.28) 0 8px, transparent 8px 16px);
+  }
+
+  :root[data-look='playful'] .profile-hero__picture .avatar {
+    width: 112px;
+    height: 112px;
+    border: 5px solid #ffffff;
+    box-shadow: 0 6px 0 rgba(42, 26, 130, 0.45);
+  }
+
+  :root[data-look='playful'] .profile-hero__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  :root[data-look='playful'] .profile-hero__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    padding: 14px 14px 13px;
+    border: 2px solid rgba(255, 255, 255, 0.24);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 4px 0 rgba(20, 12, 70, 0.35);
+  }
+
+  :root[data-look='playful'] .profile-hero__stat-icon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    margin-bottom: 7px;
+    border-radius: 12px;
+    background: var(--sun);
+    color: var(--sun-ink);
+    box-shadow: 0 3px 0 var(--sun-edge);
+  }
+
+  :root[data-look='playful'] .profile-hero__stat-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  :root[data-look='playful'] .profile-hero__stats > :nth-child(2) .profile-hero__stat-icon {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 3px 0 var(--primary-700);
+  }
+
+  :root[data-look='playful'] .profile-hero__stats > :nth-child(3) .profile-hero__stat-icon {
+    background: var(--blue);
+    color: #ffffff;
+    box-shadow: 0 3px 0 rgba(20, 12, 70, 0.35);
+  }
+
+  :root[data-look='playful'] .profile-hero__stats > :nth-child(4) .profile-hero__stat-icon {
+    background: #ffffff;
+    color: var(--violet);
+    box-shadow: 0 3px 0 rgba(20, 12, 70, 0.35);
+  }
+
+  :root[data-look='playful'] .profile-hero__value {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1;
+    color: #ffffff;
+  }
+
+  :root[data-look='playful'] .profile-hero__label {
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  /* Banners: the accent names keep their meaning, with the palette's colours. */
+  :root[data-look='playful'] .banner {
+    border-radius: var(--radius-lg);
+  }
+
+  :root[data-look='playful'] .banner--blue {
+    background: linear-gradient(135deg, var(--hero-a), var(--hero-b));
+  }
+
+  :root[data-look='playful'] .banner--teal {
+    background: var(--primary);
+  }
+
+  :root[data-look='playful'] .banner--amber {
+    background: var(--sun);
+    color: var(--sun-ink);
+  }
+
+  :root[data-look='playful'] .banner--amber .banner__title,
+  :root[data-look='playful'] .banner--amber .banner__text {
+    color: var(--sun-ink);
+  }
+
+  :root[data-look='playful'] .banner--ink {
+    background: var(--ink);
+  }
+
+  /* Bottom navigation: the active tab shows its icon in a soft green square, not a line. */
+  :root[data-look='playful'] .nav {
+    position: relative;
+    isolation: isolate;
+    background: #ffffff;
+    border-top: 2px solid var(--line);
+  }
+
+  :root[data-look='playful'] .nav__item {
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  :root[data-look='playful'] .nav__item.is-active {
+    color: var(--primary);
+  }
+
+  :root[data-look='playful'] .nav__item.is-active::before {
+    display: none;
+  }
+
+  :root[data-look='playful'] .nav__item.is-active::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    z-index: -1;
+    width: 44px;
+    height: 32px;
+    transform: translateX(-50%);
+    border-radius: 12px;
+    background: var(--primary-50);
+  }
+
+  /* The title bar: white, with a thick bottom border. */
+  :root[data-look='playful'] .titlebar {
+    background: #ffffff;
+    border-bottom: 2px solid var(--line);
+  }
+
+  /* Progress: thick rounded bars with stripes while a value is being earned. */
+  :root[data-look='playful'] .progress {
+    height: 14px;
+    border-radius: 999px;
+    background: #dfe5fa;
+  }
+
+  :root[data-look='playful'] .progress__bar {
+    border-radius: 999px;
+    background-color: var(--primary);
+    background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 16px);
+  }
+
+  /* Inputs: a thick border, a soft ring on focus. */
+  :root[data-look='playful'] .input {
+    border: 2px solid var(--line-2);
+    border-radius: 14px;
+    background: #ffffff;
+  }
+
+  :root[data-look='playful'] .input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px var(--primary-50);
+  }
+
+  /* The show and hide eye inside a key or password field is a flat icon in the Playful look too: no edge, centred. */
+  :root[data-look='playful'] .input-wrap .btn--icon,
+  :root[data-look='playful'] .input-wrap .btn--icon:hover:not(:disabled),
+  :root[data-look='playful'] .input-wrap .btn--icon:active:not(:disabled) {
+    border: 0;
+    box-shadow: none;
+    transform: none;
+  }
+
+  :root[data-look='playful'] .input-wrap .btn--icon {
+    background: transparent;
+  }
+
+  :root[data-look='playful'] .input-wrap .btn--icon:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  /* Sheets and menus: rounder, with the card edge. */
+  :root[data-look='playful'] .sheet {
+    border-radius: var(--radius-lg);
+  }
+
+  :root[data-look='playful'] .menu {
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: 0 6px 0 var(--line-2);
+  }
+
+  /* The daily goal ring and the quests: thick bars, sun-coloured quest tiles with their edge, a green finish. */
+  :root[data-look='playful'] .daily-goal__track {
+    stroke: #dfe5fa;
+    stroke-width: 10;
+  }
+
+  :root[data-look='playful'] .daily-goal__value {
+    stroke: var(--primary);
+    stroke-width: 10;
+  }
+
+  :root[data-look='playful'] .quest__icon {
+    border-radius: 12px;
+    background: var(--sun);
+    box-shadow: 0 3px 0 var(--sun-edge);
+    color: var(--sun-ink);
+  }
+
+  :root[data-look='playful'] .quest--done .quest__icon {
+    background: var(--primary);
+    box-shadow: 0 3px 0 var(--primary-700);
+    color: #ffffff;
+  }
+
+  :root[data-look='playful'] .quest__bar {
+    height: 12px;
+    background: #dfe5fa;
+  }
+
+  :root[data-look='playful'] .quest__bar > span {
+    background-color: var(--primary);
+    background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 16px);
+  }
+
+  /* Flashcards: the decks and cards have a thick border and an edge; the grades are 3D buttons with their colours. */
+  :root[data-look='playful'] .deck-card {
+    border: 2px solid var(--line);
+    border-left: 8px solid var(--deck, var(--primary));
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+  }
+
+  :root[data-look='playful'] .card-item {
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+  }
+
+  :root[data-look='playful'] .flip-card__face {
+    border: 2px solid var(--line-2);
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 6px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .flip-card__face--back {
+    background: var(--primary-50);
+    border-color: #b8e8c9;
+    box-shadow: 0 6px 0 #b8e8c9;
+  }
+
+  :root[data-look='playful'] .grade {
+    box-shadow: 0 5px 0 rgba(29, 26, 61, 0.28);
+    transition: transform 80ms ease, box-shadow 80ms ease;
+  }
+
+  :root[data-look='playful'] .grade:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+
+  /* The coloured grades take the same soft tint on hover as the coloured cards: a white layer over the colour. */
+  :root[data-look='playful'] .grade:hover:not(:disabled) {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.14));
+  }
+
+  :root[data-look='playful'] .grade--again {
+    background: var(--red);
+    box-shadow: 0 5px 0 var(--red-edge);
+  }
+
+  :root[data-look='playful'] .grade--hard {
+    background: #b7791f;
+    box-shadow: 0 5px 0 #8a5a00;
+  }
+
+  /* Good keeps its green in the Playful look, the colour of a right answer, while the accent is purple. */
+  :root[data-look='playful'] .grade--good {
+    background: var(--green);
+    box-shadow: 0 5px 0 var(--green-edge);
+  }
+
+  :root[data-look='playful'] .grade--easy {
+    background: var(--blue);
+    box-shadow: 0 5px 0 var(--blue-edge);
+  }
+
+  :root[data-look='playful'] .study-summary__item {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    background: #ffffff;
+  }
+
+  :root[data-look='playful'] .study-summary__value {
+    color: var(--primary-700);
+  }
+
+  /* The achievements: an unlocked badge is a violet 3D tile; a locked one is grey and flat. */
+  :root[data-look='playful'] .achievement {
+    border: 2px solid var(--line);
+    border-radius: var(--radius);
+    background: #ffffff;
+    box-shadow: var(--shadow);
+  }
+
+  :root[data-look='playful'] .achievement__badge {
+    border-radius: 14px;
+  }
+
+  :root[data-look='playful'] .achievement--on .achievement__badge {
+    background: var(--violet);
+    box-shadow: 0 4px 0 var(--violet-edge);
+  }
+
+  :root[data-look='playful'] .achievement__bar {
+    height: 10px;
+    background: #dfe5fa;
+  }
+
+  :root[data-look='playful'] .achievement__bar > span {
+    background-color: var(--violet);
+    background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 16px);
+  }
+
+  /* The league: each tier has its colour, the bar is thick and striped, and the bars of the week are green. */
+  :root[data-look='playful'] .league__tier--bronze {
+    background: #f3e2d2;
+    color: #6b3d12;
+  }
+
+  :root[data-look='playful'] .league__tier--silver {
+    background: #e6eaf2;
+    color: #3d4860;
+  }
+
+  :root[data-look='playful'] .league__tier--gold {
+    background: var(--sun);
+    color: var(--sun-ink);
+  }
+
+  :root[data-look='playful'] .league__tier--sapphire {
+    background: var(--blue-50);
+    color: var(--blue);
+  }
+
+  :root[data-look='playful'] .league__tier--ruby {
+    background: var(--red-50);
+    color: var(--red-ink);
+  }
+
+  :root[data-look='playful'] .league__tier--emerald {
+    background: var(--primary-50);
+    color: var(--primary-700);
+  }
+
+  :root[data-look='playful'] .league__tier--diamond {
+    background: var(--violet-50);
+    color: var(--violet);
+  }
+
+  :root[data-look='playful'] .league__bar {
+    height: 14px;
+    background: #dfe5fa;
+  }
+
+  :root[data-look='playful'] .league__bar > span {
+    background-color: var(--primary);
+    background-image: repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.18) 0 8px, transparent 8px 16px);
+  }
+
+  :root[data-look='playful'] .league__who {
+    background-color: var(--violet);
+    box-shadow: 0 2px 0 var(--violet-edge);
+  }
+
+  :root[data-look='playful'] .league__column {
+    background: var(--primary);
+    box-shadow: 0 3px 0 var(--primary-700);
+  }
+
+  /* The tour in the Playful look: a white card with a chunky edge, and a lit button with a rounder frame. */
+  :root[data-look='playful'] .tour__card,
+  :root[data-look='playful'] .tour-offer__card {
+    border: 2px solid var(--line-2);
+    border-radius: 20px;
+    box-shadow: 0 5px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .tour__spot {
+    border-radius: 16px;
+  }
+
+  /* The streak in the title bar takes the look of the XP badge it has replaced: a sun-coloured block with its edge. The
+     flame keeps its colour, which tells the tier of the streak. */
+  :root[data-look='playful'] .streak,
+  :root[data-look='playful'] .streak--ruby,
+  :root[data-look='playful'] .streak--sapphire,
+  :root[data-look='playful'] .streak--amethyst {
+    height: 30px;
+    padding: 0 9px;
+    border-radius: 10px;
+    background: var(--sun);
+    box-shadow: 0 2px 0 var(--sun-edge);
+    color: var(--sun-ink);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  /* An empty message disables the send button. In the Playful look it keeps the accent and its white arrow, as in the
+     Classic look, so the arrow stays visible. */
+  :root[data-look='playful'] .coach-send.btn--primary:disabled,
+  :root[data-look='playful'] .coach-send.btn--primary:disabled:hover {
+    background: var(--primary);
+    border-color: transparent;
+    box-shadow: 0 4px 0 var(--primary-700);
+    color: #ffffff;
+  }
+
+  :root[data-look='playful'] .coach-send.btn--primary:disabled svg {
+    color: #ffffff;
+    stroke: #ffffff;
+  }
+
+  /* The word card of the reader (tap to define): a rounded card with its edge, and the tapped word lifted by a line. */
+  :root[data-look='playful'] .word-card {
+    border: 2px solid var(--line-2);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 6px 0 var(--line-2), 0 18px 30px -18px rgba(29, 26, 61, 0.35);
+  }
+
+  :root[data-look='playful'] .word-card__word {
+    font-weight: 900;
+  }
+
+  :root[data-look='playful'] .word-card__mark {
+    box-shadow: inset 0 -3px 0 var(--primary);
+  }
+
+  /* The role-play scenes of the coach: a chunky card with its edge, and the title in heavy type. */
+  :root[data-look='playful'] .roleplay-card {
+    border: 2px solid var(--line-2);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .roleplay-card:hover:not(:disabled) {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  :root[data-look='playful'] .roleplay-card__title {
+    font-weight: 900;
+  }
+
+  /* The score report's hero is a blue band, so its date line stays light in the Playful look. */
+  :root[data-look='playful'] .report-hero .eyebrow {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  /* ---------- Clickable things in the Playful look: every one takes the look of the Roadmap button. ---------- */
+  /* The Roadmap button is the reference: white, a 2px line, a bottom edge, the same soft tint on hover, and a press that
+     sinks it into the page. Buttons, cards, rows, choices, pickers and the profile buttons all use it. */
+  :root[data-look='playful'] .btn--icon,
+  :root[data-look='playful'] .btn--text,
+  :root[data-look='playful'] .avatar-btn,
+  :root[data-look='playful'] .icon-wrap,
+  :root[data-look='playful'] .choice,
+  :root[data-look='playful'] .set-row:not(.set-row--static),
+  :root[data-look='playful'] .mode-card,
+  :root[data-look='playful'] .roleplay-card,
+  :root[data-look='playful'] .focus-card,
+  :root[data-look='playful'] .recent-list__item,
+  :root[data-look='playful'] .suggest button,
+  :root[data-look='playful'] .feature-card,
+  :root[data-look='playful'] .deck-card,
+  :root[data-look='playful'] .look-card,
+  :root[data-look='playful'] .look-option,
+  :root[data-look='playful'] .pick__trigger,
+  :root[data-look='playful'] .profile-hero__icon,
+  :root[data-look='playful'] .profile-hero__picture-edit,
+  :root[data-look='playful'] .profile-hero__banner-edit {
+    background: #ffffff;
+    color: var(--ink);
+    border: 2px solid var(--line-2);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 0 var(--line-2);
+    transition:
+      transform 80ms ease,
+      box-shadow 80ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  :root[data-look='playful'] .btn--icon:hover:not(:disabled),
+  :root[data-look='playful'] .btn--text:hover:not(:disabled),
+  :root[data-look='playful'] .avatar-btn:hover:not(:disabled),
+  :root[data-look='playful'] .icon-wrap:hover:not(:disabled),
+  :root[data-look='playful'] .choice:hover:not(:disabled),
+  :root[data-look='playful'] .set-row:not(.set-row--static):hover:not(:disabled),
+  :root[data-look='playful'] .mode-card:hover:not(:disabled),
+  :root[data-look='playful'] .roleplay-card:hover:not(:disabled),
+  :root[data-look='playful'] .focus-card:hover:not(:disabled),
+  :root[data-look='playful'] .recent-list__item:hover:not(:disabled),
+  :root[data-look='playful'] .suggest button:hover:not(:disabled),
+  :root[data-look='playful'] .feature-card:hover:not(:disabled),
+  :root[data-look='playful'] .deck-card:hover:not(:disabled),
+  :root[data-look='playful'] .look-card:hover:not(:disabled),
+  :root[data-look='playful'] .look-option:hover:not(:disabled),
+  :root[data-look='playful'] .pick__trigger:hover:not(:disabled),
+  :root[data-look='playful'] .profile-hero__icon:hover:not(:disabled),
+  :root[data-look='playful'] .profile-hero__picture-edit:hover:not(:disabled),
+  :root[data-look='playful'] .profile-hero__banner-edit:hover:not(:disabled) {
+    background: var(--surface-2);
+    border-color: var(--line-2);
+    box-shadow: 0 4px 0 var(--line-2);
+    transform: none;
+  }
+
+  :root[data-look='playful'] .btn--icon:active:not(:disabled),
+  :root[data-look='playful'] .btn--text:active:not(:disabled),
+  :root[data-look='playful'] .avatar-btn:active:not(:disabled),
+  :root[data-look='playful'] .icon-wrap:active:not(:disabled),
+  :root[data-look='playful'] .choice:active:not(:disabled),
+  :root[data-look='playful'] .set-row:not(.set-row--static):active:not(:disabled),
+  :root[data-look='playful'] .mode-card:active:not(:disabled),
+  :root[data-look='playful'] .roleplay-card:active:not(:disabled),
+  :root[data-look='playful'] .focus-card:active:not(:disabled),
+  :root[data-look='playful'] .recent-list__item:active:not(:disabled),
+  :root[data-look='playful'] .suggest button:active:not(:disabled),
+  :root[data-look='playful'] .feature-card:active:not(:disabled),
+  :root[data-look='playful'] .deck-card:active:not(:disabled),
+  :root[data-look='playful'] .look-card:active:not(:disabled),
+  :root[data-look='playful'] .look-option:active:not(:disabled),
+  :root[data-look='playful'] .pick__trigger:active:not(:disabled),
+  :root[data-look='playful'] .profile-hero__icon:active:not(:disabled),
+  :root[data-look='playful'] .profile-hero__picture-edit:active:not(:disabled),
+  :root[data-look='playful'] .profile-hero__banner-edit:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+
+  /* A chosen card keeps its colour in the Playful look. The base rules above give every card a white face and a grey
+     edge, which would hide the violet edge and the tint of a choice, so the chosen cards are set again here, under the
+     pointer too. The press still sinks a chosen card like any other. */
+  :root[data-look='playful'] .choice[aria-checked='true'],
+  :root[data-look='playful'] .look-card[aria-checked='true'],
+  :root[data-look='playful'] .mode-card[aria-checked='true'],
+  :root[data-look='playful'] .choice[aria-checked='true']:hover:not(:disabled),
+  :root[data-look='playful'] .look-card[aria-checked='true']:hover:not(:disabled),
+  :root[data-look='playful'] .mode-card[aria-checked='true']:hover:not(:disabled) {
+    background: var(--primary-50);
+    border-color: var(--primary);
+    box-shadow: 0 4px 0 var(--primary-700);
+  }
+
+  :root[data-look='playful'] .choice[aria-checked='true']:active:not(:disabled),
+  :root[data-look='playful'] .look-card[aria-checked='true']:active:not(:disabled),
+  :root[data-look='playful'] .mode-card[aria-checked='true']:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+
+  :root[data-look='playful'] .btn--icon:focus-visible,
+  :root[data-look='playful'] .btn--text:focus-visible,
+  :root[data-look='playful'] .avatar-btn:focus-visible,
+  :root[data-look='playful'] .icon-wrap:focus-visible,
+  :root[data-look='playful'] .choice:focus-visible,
+  :root[data-look='playful'] .set-row:not(.set-row--static):focus-visible,
+  :root[data-look='playful'] .mode-card:focus-visible,
+  :root[data-look='playful'] .roleplay-card:focus-visible,
+  :root[data-look='playful'] .focus-card:focus-visible,
+  :root[data-look='playful'] .recent-list__item:focus-visible,
+  :root[data-look='playful'] .suggest button:focus-visible,
+  :root[data-look='playful'] .feature-card:focus-visible,
+  :root[data-look='playful'] .deck-card:focus-visible,
+  :root[data-look='playful'] .look-card:focus-visible,
+  :root[data-look='playful'] .look-option:focus-visible,
+  :root[data-look='playful'] .pick__trigger:focus-visible,
+  :root[data-look='playful'] .profile-hero__icon:focus-visible,
+  :root[data-look='playful'] .profile-hero__picture-edit:focus-visible,
+  :root[data-look='playful'] .profile-hero__banner-edit:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+  }
+
+  :root[data-look='playful'] .btn--icon:disabled,
+  :root[data-look='playful'] .btn--text:disabled,
+  :root[data-look='playful'] .avatar-btn:disabled,
+  :root[data-look='playful'] .icon-wrap:disabled,
+  :root[data-look='playful'] .choice:disabled,
+  :root[data-look='playful'] .set-row:not(.set-row--static):disabled,
+  :root[data-look='playful'] .mode-card:disabled,
+  :root[data-look='playful'] .roleplay-card:disabled,
+  :root[data-look='playful'] .focus-card:disabled,
+  :root[data-look='playful'] .recent-list__item:disabled,
+  :root[data-look='playful'] .suggest button:disabled,
+  :root[data-look='playful'] .feature-card:disabled,
+  :root[data-look='playful'] .deck-card:disabled,
+  :root[data-look='playful'] .look-card:disabled,
+  :root[data-look='playful'] .look-option:disabled,
+  :root[data-look='playful'] .pick__trigger:disabled,
+  :root[data-look='playful'] .profile-hero__icon:disabled,
+  :root[data-look='playful'] .profile-hero__picture-edit:disabled,
+  :root[data-look='playful'] .profile-hero__banner-edit:disabled {
+    background: #d5dbef;
+    border-color: transparent;
+    color: #6b6f92;
+    box-shadow: 0 4px 0 #c4cbea;
+    opacity: 1;
+  }
+
+  /* The small ones are 40 pixels with the Roadmap button's corners; the avatar is round; a text button is a 40 pixel
+     bar with the same edge; a deck keeps its colour stripe on the left. */
+  :root[data-look='playful'] .btn--icon,
+  :root[data-look='playful'] .icon-wrap,
+  :root[data-look='playful'] .profile-hero__icon,
+  :root[data-look='playful'] .profile-hero__picture-edit,
+  :root[data-look='playful'] .profile-hero__banner-edit {
+    border-radius: 12px;
+  }
+
+  :root[data-look='playful'] .btn--text {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 14px;
+    font-weight: 800;
+  }
+
+  :root[data-look='playful'] .avatar-btn {
+    border-radius: 50%;
+  }
+
+  :root[data-look='playful'] .deck-card {
+    border-left-width: 8px;
+    border-left-color: var(--deck, var(--primary));
+  }
+
+  /* The switch, the bottom tabs and the menus take the same press and tint. */
+  :root[data-look='playful'] .switch {
+    box-shadow: 0 3px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .switch:active {
+    transform: translateY(3px);
+    box-shadow: none;
+  }
+
+  :root[data-look='playful'] .nav__item {
+    transition:
+      transform 80ms ease,
+      background-color 150ms ease;
+  }
+
+  :root[data-look='playful'] .nav__item:hover {
+    background: var(--surface-2);
+    border-radius: 14px;
+  }
+
+  :root[data-look='playful'] .nav__item:active {
+    transform: none;
+  }
+
+  :root[data-look='playful'] .nav__item.is-active svg {
+    transform: none;
+  }
+
+  :root[data-look='playful'] .menu__item:hover {
+    background: var(--surface-2);
+  }
+
+  :root[data-look='playful'] .menu__item:active {
+    transform: translateY(2px);
+  }
+
+  /* The coloured section cards of Self study: the same edge and press as the buttons, and a tint on hover. Each card
+     has its own edge colour, a shade darker than its background. The tint is a white layer that fades in, not a change
+     of brightness, which flickered on the colour when the pointer moved over the card. */
+  :root[data-look='playful'] .section-card {
+    border-radius: 22px;
+    box-shadow: 0 6px 0 var(--edge, rgba(15, 23, 42, 0.35));
+    transition:
+      transform 80ms ease,
+      box-shadow 80ms ease;
+  }
+
+  :root[data-look='playful'] .section-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms ease;
+  }
+
+  :root[data-look='playful'] .section-card:hover {
+    transform: none;
+  }
+
+  :root[data-look='playful'] .section-card:hover::before {
+    opacity: 0.12;
+  }
+
+  :root[data-look='playful'] .section-card:active {
+    transform: translateY(6px);
+    box-shadow: none;
+  }
+
+  :root[data-look='playful'] .section-grid > :nth-child(1) {
+    --edge: #0b1450;
+  }
+
+  :root[data-look='playful'] .section-grid > :nth-child(2) {
+    --edge: #8f3006;
+  }
+
+  :root[data-look='playful'] .section-grid > :nth-child(3) {
+    --edge: #3a1278;
+  }
+
+  :root[data-look='playful'] .section-grid > :nth-child(4) {
+    --edge: #0c4a22;
+  }
+
+  :root[data-look='playful'] .section-card__title {
+    font-size: 30px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+  }
+
+  :root[data-look='playful'] .section-card__kicker,
+  :root[data-look='playful'] .section-card__stats {
+    font-weight: 700;
+  }
+
+  :root[data-look='playful'] .section-card .pill-light {
+    height: 28px;
+    padding: 0 11px;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.16);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  :root[data-look='playful'] .section-card .progress {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  :root[data-look='playful'] .section-card .progress__bar {
+    background-color: var(--sun);
+  }
+
+  /* The tabs (Study by section, Mock tests, and the other segment controls) are buttons too: white, with the edge. The
+     chosen tab is green, with the green edge. */
+  /* The tabs are a row of buttons, with no frame around them in the Playful look, at the height of the small buttons. */
+  :root[data-look='playful'] .segmented {
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  :root[data-look='playful'] .segmented__btn {
+    height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 800;
+    border: 2px solid var(--line-2);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--ink);
+    box-shadow: 0 4px 0 var(--line-2);
+    transition:
+      transform 80ms ease,
+      box-shadow 80ms ease,
+      background-color 150ms ease;
+  }
+
+  :root[data-look='playful'] .segmented__btn:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  /* The tabs do not move on a press: the edge flattens and the tint shows, and the row keeps its place. */
+  :root[data-look='playful'] .segmented__btn:active {
+    transform: none;
+    box-shadow: 0 1px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .segmented__btn[aria-selected='true']:active,
+  :root[data-look='playful'] .segmented__btn.is-active:active {
+    box-shadow: 0 1px 0 var(--primary-700);
+  }
+
+  :root[data-look='playful'] .segmented__btn[aria-selected='true'],
+  :root[data-look='playful'] .segmented__btn.is-active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 4px 0 var(--primary-700);
+  }
+
+  :root[data-look='playful'] .segmented__btn[aria-selected='true']:hover:not(:disabled),
+  :root[data-look='playful'] .segmented__btn.is-active:hover:not(:disabled) {
+    background: var(--primary-600);
+  }
+
+  /* The flag on a language tab is a little bigger in the Playful look, and on the green tab it has a white ring. */
+  :root[data-look='playful'] .lang-flag {
+    height: 22px;
+    border-radius: 5px;
+    box-shadow: 0 0 0 1px var(--line-2);
+  }
+
+  :root[data-look='playful'] .segmented__btn[aria-selected='true'] .lang-flag,
+  :root[data-look='playful'] .segmented__btn.is-active .lang-flag {
+    box-shadow: 0 0 0 2px #ffffff;
+  }
+
+  /* The skill tiles on Today, the remove button of the level report and the tools under each coach reply are clickable
+     too: the same white, edge, tint and press as the Roadmap button. */
+  :root[data-look='playful'] .tile,
+  :root[data-look='playful'] .level-report__remove,
+  :root[data-look='playful'] .turn__tool {
+    background: #ffffff;
+    color: var(--ink);
+    border: 2px solid var(--line-2);
+    border-radius: 12px;
+    box-shadow: 0 4px 0 var(--line-2);
+    transition:
+      transform 80ms ease,
+      box-shadow 80ms ease,
+      background-color 150ms ease;
+  }
+
+  :root[data-look='playful'] .tile:hover:not(:disabled),
+  :root[data-look='playful'] .level-report__remove:hover:not(:disabled),
+  :root[data-look='playful'] .turn__tool:hover:not(:disabled) {
+    background: var(--surface-2);
+    box-shadow: 0 4px 0 var(--line-2);
+    transform: none;
+  }
+
+  :root[data-look='playful'] .tile:active:not(:disabled),
+  :root[data-look='playful'] .level-report__remove:active:not(:disabled),
+  :root[data-look='playful'] .turn__tool:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+
+  :root[data-look='playful'] .tile:disabled,
+  :root[data-look='playful'] .level-report__remove:disabled,
+  :root[data-look='playful'] .turn__tool:disabled {
+    background: #d5dbef;
+    border-color: transparent;
+    color: #6b6f92;
+    box-shadow: 0 4px 0 #c4cbea;
+    opacity: 1;
+  }
+
+  /* The Roadmap nodes are buttons like the others: the edge is the circle's own, the tint on hover is the same as on
+     every button (the background changes, with no brightness filter), and a press sinks the node 4 pixels with its edge
+     flattened, with the same timing. */
+  :root[data-look='playful'] .node {
+    box-shadow: 0 5px 0 rgba(20, 12, 70, 0.28);
+    transition:
+      transform 80ms ease,
+      box-shadow 80ms ease,
+      background-color 150ms ease,
+      border-color 150ms ease;
+  }
+
+  :root[data-look='playful'] .node:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+
+  /* The Recommended-for-you picker is the size of the buttons: 14 pixels of text, 40 pixels high, with its chevron at 16. */
+  :root[data-look='playful'] .pick__trigger {
+    height: 40px;
+    padding: 0 10px 0 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    gap: 8px;
+  }
+
+  :root[data-look='playful'] .pick__chev {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* The title bar's buttons are the size of the XP badge: 30 pixels high, with its corners and its 2 pixel edge. The
+     profile picture is round, at the same size. A press lifts them by 2 pixels, the edge's own height. */
+  :root[data-look='playful'] .titlebar__actions {
+    gap: 6px;
+  }
+
+  :root[data-look='playful'] .titlebar__actions .btn--icon,
+  :root[data-look='playful'] .titlebar__actions .icon-wrap,
+  :root[data-look='playful'] .titlebar__actions .avatar-btn {
+    width: 30px;
+    height: 30px;
+    box-shadow: 0 2px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .titlebar__actions .btn--icon:hover:not(:disabled),
+  :root[data-look='playful'] .titlebar__actions .icon-wrap:hover:not(:disabled),
+  :root[data-look='playful'] .titlebar__actions .avatar-btn:hover:not(:disabled) {
+    box-shadow: 0 2px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .titlebar__actions .btn--icon:active:not(:disabled),
+  :root[data-look='playful'] .titlebar__actions .icon-wrap:active:not(:disabled),
+  :root[data-look='playful'] .titlebar__actions .avatar-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: none;
+  }
+
+  :root[data-look='playful'] .titlebar__actions .btn--icon svg,
+  :root[data-look='playful'] .titlebar__actions .icon-wrap svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  :root[data-look='playful'] .titlebar__actions .avatar-btn {
+    padding: 0;
+  }
+
+  :root[data-look='playful'] .titlebar__actions .avatar-btn .avatar {
+    width: 22px;
+    height: 22px;
+    font-size: 10px;
+  }
+
+  /* Changing section fades the page in without the 8 pixel slide: nothing jumps when a bottom tab is chosen. */
+  :root[data-look='playful'] .shell__page {
+    transform: none !important;
+  }
+
+  /* ---------- The roadmap nodes: the same states as the buttons. The next lesson is the green primary button with its
+     edge; a finished one is a white ghost button with a green check; a locked one is the disabled button. The unit check
+     that is done is a sun button, like the XP badge. The START bubble is a sun chip. ---------- */
+  :root[data-look='playful'] .node {
+    transform: none;
+  }
+
+  :root[data-look='playful'] .node--current {
+    background: var(--primary);
+    color: #ffffff;
+    border: 0;
+    box-shadow: 0 5px 0 var(--primary-700);
+  }
+
+  :root[data-look='playful'] .node--current:hover:not(:disabled) {
+    background: var(--primary-600);
+  }
+
+  :root[data-look='playful'] .node--done {
+    background: #ffffff;
+    color: var(--primary);
+    border: 2px solid var(--line-2);
+    box-shadow: 0 4px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .node--done:hover:not(:disabled) {
+    background: var(--surface-2);
+  }
+
+  :root[data-look='playful'] .node--locked {
+    background: #d5dbef;
+    color: #6b6f92;
+    border: 2px solid transparent;
+    box-shadow: 0 4px 0 #c4cbea;
+  }
+
+  :root[data-look='playful'] .node--checkpoint.node--done {
+    background: var(--sun);
+    color: var(--sun-ink);
+    border: 0;
+    box-shadow: 0 5px 0 var(--sun-edge);
+  }
+
+  :root[data-look='playful'] .node--checkpoint.node--done:hover:not(:disabled) {
+    background: #ffd44f;
+  }
+
+  :root[data-look='playful'] .node.pulse {
+    animation-name: pulse-playful;
+  }
+
+  :root[data-look='playful'] .node__bubble {
+    background: var(--sun);
+    color: var(--sun-ink);
+    border-radius: 10px;
+    padding: 4px 10px;
+    font-weight: 900;
+    box-shadow: 0 3px 0 var(--sun-edge);
+  }
+
+  /* The question progress bar: a clean, thick bar with a smooth gloss and no stripes. The stripes aliased into a pixel
+     pattern at this height. The bar sits inside the margins of the screen, and its wrapper takes the bar's height. */
+  :root[data-look='playful'] .runner__progress {
+    height: auto;
+    background: transparent;
+  }
+
+  :root[data-look='playful'] .runner__progress .progress {
+    height: 14px;
+    margin: 8px 20px;
+    background: #dfe5fa;
+  }
+
+  :root[data-look='playful'] .runner__progress .progress__bar {
+    border-radius: 999px;
+    background-color: var(--primary);
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0) 60%);
+  }
+
+  /* A notice with a button, in the Playful look: the message on the left and its button on the right, on one row and
+     centred across the height. On a narrow screen the button drops under the message. The notice's text sits in one
+     span, so the span is the row. */
+  :root[data-look='playful'] .notice:has(button) > span {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+  }
+
+  /* A text button in the Playful look is a button: its hover shows the tint, not an underline. */
+  :root[data-look='playful'] .btn--text:hover {
+    text-decoration: none;
+  }
+
+  /* Reduced motion: the presses and lifts still show, but nothing moves for long. */
+  @media (prefers-reduced-motion: reduce) {
+    :root[data-look='playful'] .btn,
+    :root[data-look='playful'] .card--hover:hover,
+    :root[data-look='playful'] .feature-card--link:hover {
+      transition: none;
+    }
+  }
+}

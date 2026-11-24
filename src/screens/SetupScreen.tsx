@@ -1,0 +1,302 @@
+import { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { Field, Notice, Spinner } from '../components/ui';
+import { KeyConnect } from '../components/KeyConnect';
+import { LookPicker } from '../components/LookPicker';
+import { DateField, todayIso } from '../components/Pickers';
+import { errorText } from '../lib/bridge';
+import { useT } from '../lib/i18n/react';
+import { useAuth } from '../state/auth';
+import { useAppData } from '../state/appData';
+import { useToast } from '../state/toast';
+import { lookOf } from '../lib/look';
+import { LEVELS, type Goal, type Level, type LookId } from '../lib/types';
+
+const TARGETS = [80, 90, 100, 110];
+const LEVEL_TEXT: Record<Level, string> = {
+  A1: 'Single words and simple sentences about yourself. The coach starts from the very beginning.',
+  A2: 'Short sentences and everyday topics. The coach builds on what you already know.',
+  B1: 'Clear everyday and study topics, with longer sentences.',
+  B2: 'Longer texts, opinions and academic topics.',
+  C1: 'Complex structures and academic writing.',
+};
+
+const STEPS = ['Look', 'Name', 'Goal', 'Level', 'AI'];
+
+/** The heading block every step uses: a short eyebrow, the question, and one line of help. */
+function StepHead({ eyebrow, title, text }: { eyebrow: string; title: string; text?: string }) {
+  return (
+    <div className="step-head">
+      <p className="eyebrow">{eyebrow}</p>
+      <h1 className="page-title">{title}</h1>
+      {text && <p className="muted">{text}</p>}
+    </div>
+  );
+}
+
+export function SetupScreen() {
+  const navigate = useNavigate();
+  const t = useT();
+  const { mode } = useAuth();
+  const { profile, patchProfile, ready, loadError } = useAppData();
+  const { notify } = useToast();
+  const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [goal, setGoal] = useState<Goal | null>(null);
+  const [target, setTarget] = useState<number | null>(null);
+  const [examDate, setExamDate] = useState<string | null>(null);
+  const [level, setLevel] = useState<Level | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [savingLook, setSavingLook] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!ready) {
+    return (
+      <div className="auth" role="status">
+        <Spinner dark />
+        <span className="sr-only">{t('Loading')}</span>
+      </div>
+    );
+  }
+  if (!profile) {
+    return (
+      <div className="auth">
+        <Notice tone="error">{loadError ? t(loadError) : t('Your profile could not be loaded.')}</Notice>
+      </div>
+    );
+  }
+
+  const shownName = displayName ?? profile.display_name;
+  const shownUsername = username ?? profile.username;
+  const shownGoal = goal ?? profile.goal;
+  const shownTarget = target ?? profile.target_score;
+  const shownDate = examDate ?? profile.exam_date ?? '';
+  const shownLevel = level ?? profile.level;
+  const look = lookOf(profile);
+
+  // The look is saved to the profile: to the account, or to this device without one.
+  const chooseLook = async (next: LookId) => {
+    if (next === look) return;
+    setSavingLook(true);
+    try {
+      await patchProfile({ ui_style: next });
+      notify(t('Your look is saved.'), 'ok');
+    } catch (caught) {
+      notify(t(errorText(caught)), 'error');
+    } finally {
+      setSavingLook(false);
+    }
+  };
+
+  const next = () => {
+    setError(null);
+    if (step === 1) {
+      if (!shownName.trim()) return setError(t('Add the name you want botdanna to use.'));
+      if (mode === 'supabase' && !/^[a-z0-9_]{3,20}$/.test(shownUsername)) {
+        return setError(t('Usernames use 3 to 20 lowercase letters, numbers or underscores.'));
+      }
+    }
+    setDirection(1);
+    setStep((value) => Math.min(value + 1, STEPS.length - 1));
+  };
+
+  const back = () => {
+    setError(null);
+    setDirection(-1);
+    setStep((value) => Math.max(value - 1, 0));
+  };
+
+  const finish = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await patchProfile({
+        username: shownUsername,
+        display_name: shownName.trim(),
+        goal: shownGoal,
+        target_score: shownTarget,
+        exam_date: shownDate || null,
+        level: shownLevel,
+        onboarding_done: true,
+      });
+      notify(t('Your plan is ready.'), 'ok');
+      navigate('/', { replace: true });
+    } catch (caught) {
+      setError(t(errorText(caught)));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const variants = {
+    enter: (dir: number) => ({ opacity: 0, x: dir > 0 ? 28 : -28 }),
+    center: { opacity: 1, x: 0 },
+    exit: (dir: number) => ({ opacity: 0, x: dir > 0 ? -28 : 28 }),
+  };
+
+  return (
+    <div className="wizard">
+      <div className="wizard__body">
+        <div className="wizard__content">
+          <div className="wizard__steps" aria-label={t('Step {step} of {total}', { step: step + 1, total: STEPS.length })}>
+            {STEPS.map((label, index) => (
+              <div key={label} className="wizard__step">
+                <motion.span
+                  initial={false}
+                  animate={{ scaleX: index <= step ? 1 : 0 }}
+                  transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+                />
+              </div>
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait" custom={direction} initial={false}>
+            <motion.div
+              key={step}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
+              className="stack stack--loose"
+            >
+              {step === 0 && (
+                <>
+                  <StepHead
+                    eyebrow={t('Look')}
+                    title={t('Pick the look you like')}
+                    text={t('Both looks have every feature. You can change it later in Settings.')}
+                  />
+                  <LookPicker value={look} disabled={savingLook} onChange={(next) => void chooseLook(next)} />
+                </>
+              )}
+
+              {step === 1 && (
+                <>
+                  <StepHead
+                    eyebrow={t('Learning setup')}
+                    title={t('What should botdanna call you?')}
+                    text={
+                      mode === 'supabase'
+                        ? t('Your username is how you are known in your account. You can change these later in your profile.')
+                        : t('This is how botdanna greets you. You can change it later in your profile.')
+                    }
+                  />
+                  <Field label={t('Name')}>
+                    <input className="input" value={shownName} onChange={(event) => setDisplayName(event.target.value)} maxLength={40} />
+                  </Field>
+                  {mode === 'supabase' && (
+                    <Field label={t('Username')} hint={t('3 to 20 characters: lowercase letters, numbers and underscores.')}>
+                      <input
+                        className="input"
+                        value={shownUsername}
+                        onChange={(event) => setUsername(event.target.value.toLowerCase())}
+                        maxLength={20}
+                      />
+                    </Field>
+                  )}
+                </>
+              )}
+
+              {step === 2 && (
+                <>
+                  <StepHead
+                    eyebrow={t('Your goal')}
+                    title={t('What do you want to practice?')}
+                    text={t('Most people choose General English. The TOEFL warm-up is a focus you can add at any time.')}
+                  />
+                  <div className="choice-grid" role="radiogroup" aria-label={t('Goal')}>
+                    <button role="radio" aria-checked={shownGoal === 'english'} className="choice" onClick={() => setGoal('english')}>
+                      <span className="choice__tick">{shownGoal === 'english' && <Check aria-hidden="true" />}</span>
+                      <span className="choice__title">{t('General English')}</span>
+                      <span className="choice__text">
+                        {t('Grammar, words, reading, listening, speaking and writing for daily life, study and work.')}
+                      </span>
+                    </button>
+                    <button role="radio" aria-checked={shownGoal === 'toefl'} className="choice" onClick={() => setGoal('toefl')}>
+                      <span className="choice__tick">{shownGoal === 'toefl' && <Check aria-hidden="true" />}</span>
+                      <span className="choice__title">{t('TOEFL warm-up')}</span>
+                      <span className="choice__text">{t('Practice in the style of the test, with an estimated score and a countdown.')}</span>
+                    </button>
+                  </div>
+                  {shownGoal === 'toefl' && (
+                    <>
+                      <p className="field__label">{t('Target score')}</p>
+                      <div className="choice-grid choice-grid--four" role="radiogroup" aria-label={t('Target score')}>
+                        {TARGETS.map((score) => (
+                          <button key={score} role="radio" aria-checked={shownTarget === score} className="choice" onClick={() => setTarget(score)}>
+                            <span className="choice__tick">{shownTarget === score && <Check aria-hidden="true" />}</span>
+                            <span className="choice__title">{score}+</span>
+                            <span className="choice__text">{t('out of 120')}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <Field label={t('Exam date (optional)')} hint={t('The coach uses it to plan your practice and count the days left.')}>
+                        <DateField label={t('Exam date')} value={shownDate} onChange={setExamDate} min={todayIso()} />
+                      </Field>
+                    </>
+                  )}
+                </>
+              )}
+
+              {step === 3 && (
+                <>
+                  <StepHead
+                    eyebrow={t('Current level')}
+                    title={t('Where do you feel most comfortable?')}
+                    text={t('Be honest. The coach adjusts as it learns how you write and speak.')}
+                  />
+                  <div className="choice-grid" role="radiogroup" aria-label={t('Current level')}>
+                    {LEVELS.map((item) => (
+                      <button key={item} role="radio" aria-checked={shownLevel === item} className="choice" onClick={() => setLevel(item)}>
+                        <span className="choice__tick">{shownLevel === item && <Check aria-hidden="true" />}</span>
+                        <span className="choice__title">{item}</span>
+                        <span className="choice__text">{t(LEVEL_TEXT[item])}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {step === 4 && (
+                <>
+                  <StepHead
+                    eyebrow={t('AI key')}
+                    title={t('Connect your AI key')}
+                    text={t('botdanna is powered by your own key. Works with OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. You can skip this and add it later.')}
+                  />
+                  <KeyConnect autoFocus />
+                  <p className="muted">{t('Prefer to wait? Add a key later in Settings. It stays on this device.')}</p>
+                </>
+              )}
+            </motion.div>
+          </AnimatePresence>
+
+          {error && <Notice tone="error">{error}</Notice>}
+        </div>
+      </div>
+
+      <div className="wizard__footer">
+        <div className="wizard__bar">
+          <button className="btn btn--ghost" onClick={back} disabled={step === 0 || busy}>
+            <ArrowLeft /> {t('Back')}
+          </button>
+          {step < STEPS.length - 1 ? (
+            <button className="btn btn--primary" onClick={next}>
+              {t('Continue')} <ArrowRight />
+            </button>
+          ) : (
+            <button className="btn btn--primary" onClick={finish} disabled={busy}>
+              {busy ? <Spinner /> : null} {t('Start my plan')}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

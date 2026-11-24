@@ -1,0 +1,137 @@
+// Offline data on the desktop. Every call goes to the local database file through
+// the bridge. Friends and sharing are not part of offline use.
+import type { BotdannaBridge } from '../bridge';
+import type { AttemptKind, AttemptRow, CardRow, DeckRow, LeagueRow, LessonProgressRow, LibraryFileRow, LibraryLinkRow, ProfileRow, ReviewRow, Skill, TestRow, TutorChatRow, TutorRow } from '../types';
+import type { CardPatch, DataBackend, DeckPatch, LibraryFileUpdate, LibraryLinkPatch, NewAttempt, NewCard, NewDeck, NewLibraryFile, NewLibraryLink, NewTest, ProfilePatch } from './backend';
+
+const ONLINE_ONLY = 'This is available with an online account.';
+
+export function createSqliteBackend(bridge: BotdannaBridge): DataBackend {
+  const call = <T>(method: string, args: unknown[] = []): Promise<T> => bridge.local.call<T>(method, args);
+
+  return {
+    mode: 'local',
+
+    getProfile: () => call<ProfileRow>('getProfile'),
+    updateProfile: (patch: ProfilePatch) => call<ProfileRow>('updateProfile', [patch]),
+
+    getAvatar: async () => {
+      const bytes = await call<Uint8Array | null>('getAvatar');
+      return bytes ? new Blob([Uint8Array.from(bytes)], { type: 'image/webp' }) : null;
+    },
+    setAvatar: async (picture: Blob | null) => {
+      if (!picture) return call<ProfileRow>('clearAvatar');
+      return call<ProfileRow>('setAvatar', [await picture.arrayBuffer()]);
+    },
+    fetchAvatar: async () => null,
+
+    getBanner: async () => {
+      const bytes = await call<Uint8Array | null>('getBanner');
+      return bytes ? new Blob([Uint8Array.from(bytes)], { type: 'image/webp' }) : null;
+    },
+    setBanner: async (picture: Blob | null) => {
+      if (!picture) return call<ProfileRow>('clearBanner');
+      return call<ProfileRow>('setBanner', [await picture.arrayBuffer()]);
+    },
+    fetchBanner: async () => null,
+
+    listAttempts: (limit = 60, kind?: AttemptKind) => call<AttemptRow[]>('listAttempts', [limit, kind]),
+    countAttempts: (kind: AttemptKind) => call<number>('countAttempts', [kind]),
+    getAttempt: (id: string) => call<AttemptRow | null>('getAttempt', [id]),
+    insertAttempt: (row: NewAttempt) => call<AttemptRow>('insertAttempt', [row]),
+    listLeague: (days: number) => call<LeagueRow[]>('listLeague', [days]),
+    listDecks: () => call<DeckRow[]>('listDecks'),
+    createDeck: (input: NewDeck) => call<DeckRow>('createDeck', [input]),
+    updateDeck: (id: string, patch: DeckPatch) => call<DeckRow>('updateDeck', [id, patch]),
+    deleteDeck: (id: string) => call<void>('deleteDeck', [id]),
+    listCards: (deckId: string) => call<CardRow[]>('listCards', [deckId]),
+    createCards: (deckId: string, rows: NewCard[]) => call<CardRow[]>('createCards', [deckId, rows]),
+    updateCard: (id: string, patch: CardPatch) => call<CardRow>('updateCard', [id, patch]),
+    deleteCard: (id: string) => call<void>('deleteCard', [id]),
+    listDueCards: (now: string, limit: number) => call<CardRow[]>('listDueCards', [now, limit]),
+
+    getSkillScores: () => call<Partial<Record<Skill, number>>>('getSkillScores'),
+    setSkillScores: (scores) => call<void>('setSkillScores', [scores]),
+
+    listLessonProgress: () => call<LessonProgressRow[]>('listLessonProgress'),
+    upsertLessonProgress: (row: LessonProgressRow) => call<void>('upsertLessonProgress', [row]),
+    upsertLessonProgressMany: (rows: LessonProgressRow[]) => call<void>('upsertLessonProgressMany', [rows]),
+
+    listReviewItems: () => call<ReviewRow[]>('listReviewItems'),
+    upsertReviewItems: (rows: ReviewRow[]) => call<void>('upsertReviewItems', [rows]),
+
+    listMyTests: () => call<TestRow[]>('listMyTests'),
+    getTest: (id: string) => call<TestRow | null>('getTest', [id]),
+    insertTest: (row: NewTest) => call<TestRow>('insertTest', [row]),
+
+    listLibraryFiles: () => call<LibraryFileRow[]>('listLibraryFiles'),
+    getLibraryBlob: async (id: string) => {
+      const bytes = await call<Uint8Array | null>('getLibraryFileData', [id]);
+      return bytes ? new Blob([Uint8Array.from(bytes)]) : null;
+    },
+    getLibraryText: (id: string) => call<string>('getLibraryText', [id]),
+    addLibraryFile: async (input: NewLibraryFile) => {
+      const data = await input.blob.arrayBuffer();
+      return call<LibraryFileRow>('insertLibraryFile', [
+        {
+          id: input.id,
+          created_at: input.created_at,
+          name: input.name,
+          kind: input.kind,
+          mime_type: input.mime_type,
+          pages: input.pages,
+          extracted_text: input.extracted_text,
+          data,
+        },
+      ]);
+    },
+    updateLibraryFile: async (id: string, input: LibraryFileUpdate) => {
+      const data = await input.blob.arrayBuffer();
+      return call<LibraryFileRow>('updateLibraryFile', [id, { data, extracted_text: input.extracted_text }]);
+    },
+    deleteLibraryFile: (id: string) => call<void>('deleteLibraryFile', [id]),
+    listLibraryLinks: () => call<LibraryLinkRow[]>('listLibraryLinks'),
+    addLibraryLink: (input: NewLibraryLink) => call<LibraryLinkRow>('insertLibraryLink', [input]),
+    updateLibraryLink: (id: string, patch: LibraryLinkPatch) => call<LibraryLinkRow>('updateLibraryLink', [id, patch]),
+    deleteLibraryLink: (id: string) => call<void>('deleteLibraryLink', [id]),
+
+    listFriends: async () => [],
+    searchPeople: async () => [],
+    requestFriend: async () => {
+      throw new Error(ONLINE_ONLY);
+    },
+    answerFriend: async () => {
+      throw new Error(ONLINE_ONLY);
+    },
+    listShares: async () => [],
+    sendShare: async () => {
+      throw new Error(ONLINE_ONLY);
+    },
+    markSharesSeen: async () => undefined,
+    // This device has no account, so it keeps no sealed keys.
+    listAiKeys: async () => [],
+    saveAiKey: async () => {
+      throw new Error(ONLINE_ONLY);
+    },
+    deleteAiKey: async () => undefined,
+    feedbackWaitSeconds: async () => 0,
+
+    sendFeedback: async () => {
+      throw new Error(ONLINE_ONLY);
+    },
+
+    // Announcements come from the online account only. This copy of the app has none on the device.
+    listAnnouncements: async () => [],
+
+    listTutorChats: () => call<TutorChatRow[]>('listTutorChats'),
+    createTutorChat: (record) => call<TutorChatRow>('createTutorChat', [record?.id, record?.created_at, record?.mode ?? null]),
+    renameTutorChat: (id, title) => call<TutorChatRow>('renameTutorChat', [id, title]),
+    setTutorChatArchived: (id, archived) => call<TutorChatRow>('setTutorChatArchived', [id, archived]),
+    deleteTutorChat: (id) => call<void>('deleteTutorChat', [id]),
+    searchTutorChats: (query) => call<string[]>('searchTutorChats', [query]),
+    listTutor: (chatId, limit = 40) => call<TutorRow[]>('listTutor', [chatId, limit]),
+    deleteTutorMessage: (id) => call<void>('deleteTutorMessage', [id]),
+    addTutor: (chatId, role, content, record) =>
+      call<TutorRow>('addTutor', [chatId, role, content, record?.id, record?.created_at, record?.attachments ?? []]),
+  };
+}

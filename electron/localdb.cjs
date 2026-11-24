@@ -1,0 +1,1168 @@
+// Offline data for botdanna. One SQLite file in the app's data folder; nothing is sent anywhere.
+const { app } = require('electron');
+const { DatabaseSync } = require('node:sqlite');
+const { randomUUID } = require('node:crypto');
+const fs = require('node:fs');
+const path = require('node:path');
+const { userError } = require('./errors.cjs');
+
+const SKILLS = ['reading', 'listening', 'speaking', 'writing', 'language'];
+const TEST_SKILLS = [...SKILLS, 'mixed'];
+const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'];
+const GOALS = ['english', 'toefl'];
+const ATTEMPT_KINDS = ['diagnostic', 'lesson', 'checkpoint', 'mock', 'practice', 'review'];
+// Same limits as the online database, so a copy from this device never fails on a value.
+const AVATAR_MAX_BYTES = 300 * 1024;
+const BANNER_MAX_BYTES = 480 * 1024;
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
+// Limits on what the interface may store, so one attempt or set cannot fill the database.
+const MAX_ANSWERS = 300;
+const MAX_RESPONSE_LENGTH = 2000;
+const MAX_JSON_LENGTH = 200000;
+// Coach chats. The same limits and rules as src/lib/data/rules.ts, which must change together with these.
+const MAX_CHATS = 500;
+const CHAT_TITLE_MAX = 120;
+const MAX_ATTACHMENTS = 10;
+const ATTACHMENT_KINDS = ['image', 'document', 'library'];
+const MIME_BY_KIND = { pdf: 'application/pdf', txt: 'text/plain', md: 'text/markdown' };
+const PROFILE_FIELDS = new Set([
+  'username',
+  'display_name',
+  'avatar_color',
+  'goal',
+  'target_score',
+  'exam_date',
+  'exam_name',
+  'exam_paused',
+  'daily_minutes',
+  'level',
+  'xp',
+  'streak',
+  'last_active',
+  'onboarding_done',
+  'ui_style',
+]);
+
+// The looks a profile can use. Must match LOOKS in src/lib/types.ts.
+const LOOKS = ['classic', 'playful'];
+
+const SCHEMA = `
+CREATE TABLE IF NOT EXISTS profile (
+  id TEXT PRIMARY KEY,
+  username TEXT NOT NULL,
+  display_name TEXT NOT NULL DEFAULT '',
+  avatar_color TEXT NOT NULL DEFAULT '#2f6bff',
+  target_score INTEGER NOT NULL DEFAULT 100,
+  exam_date TEXT,
+  exam_name TEXT,
+  exam_paused INTEGER NOT NULL DEFAULT 0,
+  daily_minutes INTEGER NOT NULL DEFAULT 15,
+  level TEXT NOT NULL DEFAULT 'B1',
+  goal TEXT NOT NULL DEFAULT 'english',
+  ui_style TEXT NOT NULL DEFAULT 'classic',
+  xp INTEGER NOT NULL DEFAULT 0,
+  streak INTEGER NOT NULL DEFAULT 0,
+  last_active TEXT,
+  onboarding_done INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS attempts (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  ref_id TEXT NOT NULL DEFAULT '',
+  title TEXT NOT NULL,
+  score_pct INTEGER NOT NULL,
+  predicted INTEGER,
+  skills TEXT NOT NULL DEFAULT '{}',
+  answers TEXT NOT NULL DEFAULT '[]',
+  duration_s INTEGER NOT NULL DEFAULT 0,
+  xp INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS attempts_recent ON attempts (created_at);
+CREATE TABLE IF NOT EXISTS decks (
+  id TEXT PRIMARY KEY,
+  owner_id TEXT NOT NULL DEFAULT '',
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  colour TEXT NOT NULL DEFAULT 'green',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS cards (
+  id TEXT PRIMARY KEY,
+  deck_id TEXT NOT NULL,
+  owner_id TEXT NOT NULL DEFAULT '',
+  front TEXT NOT NULL,
+  back TEXT NOT NULL,
+  note TEXT NOT NULL DEFAULT '',
+  state TEXT NOT NULL DEFAULT 'new',
+  ease REAL NOT NULL DEFAULT 2.5,
+  interval_days INTEGER NOT NULL DEFAULT 0,
+  reps INTEGER NOT NULL DEFAULT 0,
+  lapses INTEGER NOT NULL DEFAULT 0,
+  due_at TEXT NOT NULL,
+  last_review_at TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS cards_deck ON cards (deck_id, created_at);
+CREATE INDEX IF NOT EXISTS cards_due ON cards (due_at);
+CREATE TABLE IF NOT EXISTS skill_scores (
+  skill TEXT PRIMARY KEY,
+  score INTEGER NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS lesson_progress (
+  lesson_id TEXT PRIMARY KEY,
+  stars INTEGER NOT NULL DEFAULT 0,
+  best_pct INTEGER NOT NULL DEFAULT 0,
+  attempts INTEGER NOT NULL DEFAULT 0,
+  completed_at TEXT,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS review_items (
+  item_key TEXT PRIMARY KEY,
+  skill TEXT NOT NULL,
+  payload TEXT NOT NULL,
+  ease REAL NOT NULL DEFAULT 2.5,
+  interval_days INTEGER NOT NULL DEFAULT 0,
+  reps INTEGER NOT NULL DEFAULT 0,
+  due_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS tests (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  kind TEXT NOT NULL,
+  skill TEXT NOT NULL,
+  level TEXT NOT NULL,
+  minutes INTEGER NOT NULL,
+  content TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS tutor_messages (
+  id TEXT PRIMARY KEY,
+  role TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS tutor_chats (
+  id TEXT PRIMARY KEY,
+  title TEXT,
+  archived INTEGER NOT NULL DEFAULT 0,
+  mode TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS avatar (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  data BLOB NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS banner (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  data BLOB NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS library_files (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  mime_type TEXT NOT NULL,
+  size_bytes INTEGER NOT NULL,
+  data BLOB NOT NULL,
+  extracted_text TEXT NOT NULL DEFAULT '',
+  pages INTEGER,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS library_links (
+  id TEXT PRIMARY KEY,
+  url TEXT NOT NULL,
+  title TEXT NOT NULL DEFAULT '',
+  platform TEXT NOT NULL DEFAULT 'other',
+  category TEXT NOT NULL DEFAULT 'General',
+  note TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+`;
+
+let connection = null;
+
+function db() {
+  if (connection) return connection;
+  const folder = app.getPath('userData');
+  fs.mkdirSync(folder, { recursive: true });
+  connection = new DatabaseSync(path.join(folder, 'botdanna.db'));
+  connection.exec('PRAGMA journal_mode = WAL;');
+  connection.exec(SCHEMA);
+  // Databases from version 0.2.0 do not have the picture timestamp yet.
+  const profileColumns = connection.prepare('PRAGMA table_info(profile)').all().map((column) => column.name);
+  if (!profileColumns.includes('avatar_updated_at')) {
+    connection.exec('ALTER TABLE profile ADD COLUMN avatar_updated_at TEXT');
+  }
+  if (!profileColumns.includes('banner_updated_at')) {
+    connection.exec('ALTER TABLE profile ADD COLUMN banner_updated_at TEXT');
+  }
+  // The name of the exam came with the 1.0.0 release. Older profiles have no name until the learner writes one.
+  if (!profileColumns.includes('exam_name')) connection.exec('ALTER TABLE profile ADD COLUMN exam_name TEXT');
+  // The pause of the exam came later: a profile from before it has no pause, so its exam is kept as it was.
+  if (!profileColumns.includes('exam_paused')) connection.exec('ALTER TABLE profile ADD COLUMN exam_paused INTEGER NOT NULL DEFAULT 0');
+  // Databases from before 0.4.0 do not have the learning goal yet. Their learners were all practicing for the
+  // TOEFL, so they keep the TOEFL track. New profiles default to General English (see the CREATE TABLE above).
+  if (!profileColumns.includes('goal')) {
+    connection.exec("ALTER TABLE profile ADD COLUMN goal TEXT NOT NULL DEFAULT 'english'");
+    connection.exec("UPDATE profile SET goal = 'toefl'");
+  }
+  // The look (Classic or Playful) came with 2.0.0. A profile from before it keeps the Classic look.
+  if (!profileColumns.includes('ui_style')) connection.exec("ALTER TABLE profile ADD COLUMN ui_style TEXT NOT NULL DEFAULT 'classic'");
+  // The XP of each run came with 2.0.0, for the weekly league. Runs saved before it count as 0 in the league.
+  const attemptColumns = connection.prepare('PRAGMA table_info(attempts)').all().map((column) => column.name);
+  if (!attemptColumns.includes('xp')) connection.exec('ALTER TABLE attempts ADD COLUMN xp INTEGER NOT NULL DEFAULT 0');
+  // The coach's modes came after the 1.0.0 release. Chats kept before them have no mode, and keep working as free chats.
+  const chatColumns = connection.prepare('PRAGMA table_info(tutor_chats)').all().map((column) => column.name);
+  if (!chatColumns.includes('mode')) connection.exec('ALTER TABLE tutor_chats ADD COLUMN mode TEXT');
+  // Coach chats came with the 0.6.0 release. Messages kept before them move into one chat, so none is lost.
+  const messageColumns = connection.prepare('PRAGMA table_info(tutor_messages)').all().map((column) => column.name);
+  if (!messageColumns.includes('chat_id')) connection.exec('ALTER TABLE tutor_messages ADD COLUMN chat_id TEXT');
+  if (!messageColumns.includes('attachments')) {
+    connection.exec("ALTER TABLE tutor_messages ADD COLUMN attachments TEXT NOT NULL DEFAULT '[]'");
+  }
+  connection.exec('CREATE INDEX IF NOT EXISTS tutor_messages_chat ON tutor_messages (chat_id, created_at)');
+  const orphans = connection
+    .prepare('SELECT MIN(created_at) AS first, MAX(created_at) AS last, COUNT(*) AS count FROM tutor_messages WHERE chat_id IS NULL')
+    .get();
+  if (orphans.count > 0) {
+    const chatId = randomUUID();
+    connection
+      .prepare('INSERT INTO tutor_chats (id, title, archived, created_at, updated_at) VALUES (?, NULL, 0, ?, ?)')
+      .run(chatId, orphans.first, orphans.last);
+    connection.prepare('UPDATE tutor_messages SET chat_id = ? WHERE chat_id IS NULL').run(chatId);
+  }
+  return connection;
+}
+
+const now = () => new Date().toISOString();
+
+function parse(value, fallback) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function clamp(value, min, max, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.min(max, Math.max(min, Math.round(number))) : fallback;
+}
+
+function optionalText(value) {
+  return value === undefined || value === null || value === '' ? null : String(value);
+}
+
+// Only a real date and time is stored, always in the same format. Anything else gets the fallback.
+function isoTime(value, fallback) {
+  const time = typeof value === 'string' && value ? new Date(value) : null;
+  return time && Number.isFinite(time.getTime()) ? time.toISOString() : fallback;
+}
+
+// Profile -------------------------------------------------------------------
+
+// The name of the exam as the learner typed it: trimmed, at most 80 characters, and null when empty.
+function cleanExamName(value) {
+  const text = typeof value === 'string' ? value.trim().slice(0, 80) : '';
+  return text || null;
+}
+
+// Keeps a value inside the limits the online database enforces, so copying never fails on it.
+function cleanProfileValue(key, value, current) {
+  switch (key) {
+    case 'username':
+      if (!/^[a-z0-9_]{3,20}$/.test(String(value))) {
+        throw userError('Usernames use 3 to 20 lowercase letters, numbers or underscores.');
+      }
+      return String(value);
+    case 'display_name':
+      return String(value ?? '').slice(0, 40);
+    case 'avatar_color':
+      return HEX_COLOR.test(String(value)) ? String(value) : current.avatar_color;
+    case 'target_score':
+      return clamp(value, 60, 120, current.target_score);
+    case 'daily_minutes':
+      return clamp(value, 5, 180, current.daily_minutes);
+    case 'level':
+      return LEVELS.includes(value) ? value : current.level;
+    case 'goal':
+      return GOALS.includes(value) ? value : current.goal;
+    case 'ui_style':
+      return LOOKS.includes(value) ? value : current.ui_style;
+    case 'xp':
+      return Math.max(current.xp, clamp(value, 0, 10000000, current.xp));
+    case 'streak':
+      return clamp(value, 0, 36500, current.streak);
+    case 'exam_date':
+    case 'last_active':
+      return DATE_PATTERN.test(String(value ?? '')) ? String(value) : null;
+    case 'exam_name':
+      return cleanExamName(value);
+    case 'exam_paused':
+      return value ? 1 : 0;
+    case 'onboarding_done':
+      return value ? 1 : 0;
+    default:
+      return value ?? null;
+  }
+}
+
+function toProfile(row) {
+  return {
+    ...row,
+    onboarding_done: Boolean(row.onboarding_done),
+    exam_paused: Boolean(row.exam_paused),
+    avatar_path: null,
+    avatar_updated_at: row.avatar_updated_at ?? null,
+    banner_path: null,
+    banner_updated_at: row.banner_updated_at ?? null,
+    // This device has no account, so it has no salt for the account's sealed AI keys.
+    ai_salt: null,
+  };
+}
+
+function getProfile() {
+  let row = db().prepare('SELECT * FROM profile LIMIT 1').get();
+  if (!row) {
+    const id = randomUUID();
+    db()
+      .prepare('INSERT INTO profile (id, username, display_name, created_at) VALUES (?, ?, ?, ?)')
+      .run(id, `learner${Math.floor(1000 + Math.random() * 9000)}`, 'Learner', now());
+    row = db().prepare('SELECT * FROM profile WHERE id = ?').get(id);
+  }
+  return toProfile(row);
+}
+
+function updateProfile(patch = {}) {
+  const current = getProfile();
+  const entries = Object.entries(patch || {}).filter(([key]) => PROFILE_FIELDS.has(key));
+  if (entries.length > 0) {
+    const values = entries.map(([key, value]) => cleanProfileValue(key, value, current));
+    const assignments = entries.map(([key]) => `${key} = ?`).join(', ');
+    db().prepare(`UPDATE profile SET ${assignments} WHERE id = ?`).run(...values, current.id);
+  }
+  return getProfile();
+}
+
+// Attempts ------------------------------------------------------------------
+
+function toAttempt(row) {
+  return { ...row, predicted: row.predicted ?? null, skills: parse(row.skills, {}), answers: parse(row.answers, []) };
+}
+
+// The answers of an attempt are kept as the interface sends them, but bounded in count and length.
+function cleanResponse(value) {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'number') return Number.isFinite(value) ? clamp(value, -1, 1000, 0) : null;
+  if (typeof value === 'string') return value.slice(0, MAX_RESPONSE_LENGTH);
+  if (Array.isArray(value)) return value.slice(0, 50).map((item) => String(item ?? '').slice(0, 200));
+  return null;
+}
+
+function cleanAnswers(list) {
+  if (!Array.isArray(list)) return [];
+  return list.slice(0, MAX_ANSWERS).flatMap((item) => {
+    if (!item || typeof item !== 'object') return [];
+    const fraction = Number(item.fraction);
+    return [
+      {
+        id: String(item.id ?? '').slice(0, 120),
+        skill: SKILLS.includes(item.skill) ? item.skill : 'language',
+        fraction: Number.isFinite(fraction) ? Math.min(1, Math.max(0, fraction)) : 0,
+        response: cleanResponse(item.response),
+      },
+    ];
+  });
+}
+
+// Only the five skills are kept, each as a whole number from 0 to 100.
+function cleanSkills(scores) {
+  const out = {};
+  if (!scores || typeof scores !== 'object') return out;
+  for (const skill of SKILLS) {
+    if (scores[skill] !== undefined && scores[skill] !== null) out[skill] = clamp(scores[skill], 0, 100, 0);
+  }
+  return out;
+}
+
+function listAttempts(limit = 60, kind = null) {
+  const size = clamp(limit, 1, 500, 60);
+  const rows = ATTEMPT_KINDS.includes(kind)
+    ? db().prepare('SELECT * FROM attempts WHERE kind = ? ORDER BY created_at DESC LIMIT ?').all(kind, size)
+    : db().prepare('SELECT * FROM attempts ORDER BY created_at DESC LIMIT ?').all(size);
+  return rows.map(toAttempt);
+}
+
+// How many attempts of one kind exist, so screens do not depend on the newest page of history.
+function countAttempts(kind) {
+  if (!ATTEMPT_KINDS.includes(kind)) return 0;
+  const row = db().prepare('SELECT COUNT(*) AS total FROM attempts WHERE kind = ?').get(kind);
+  return row ? Number(row.total) : 0;
+}
+
+function getAttempt(id) {
+  const row = db().prepare('SELECT * FROM attempts WHERE id = ?').get(String(id));
+  return row ? toAttempt(row) : null;
+}
+
+function insertAttempt(input = {}) {
+  const id = typeof input.id === 'string' && input.id ? input.id : randomUUID();
+  db()
+    .prepare(
+      'INSERT OR IGNORE INTO attempts (id, kind, ref_id, title, score_pct, predicted, skills, answers, duration_s, xp, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    )
+    .run(
+      id,
+      ATTEMPT_KINDS.includes(input.kind) ? input.kind : 'practice',
+      String(input.ref_id ?? '').slice(0, 120),
+      String(input.title ?? 'Practice').slice(0, 200),
+      clamp(input.score_pct, 0, 100, 0),
+      input.predicted === null || input.predicted === undefined ? null : clamp(input.predicted, 0, 120, 0),
+      JSON.stringify(cleanSkills(input.skills)),
+      JSON.stringify(cleanAnswers(input.answers)),
+      clamp(input.duration_s, 0, 86400, 0),
+      clamp(input.xp, 0, 100000, 0),
+      isoTime(input.created_at, now()),
+    );
+  return getAttempt(id);
+}
+
+// Skill scores, lessons, review ---------------------------------------------
+
+function getSkillScores() {
+  const scores = {};
+  for (const row of db().prepare('SELECT skill, score FROM skill_scores').all()) scores[row.skill] = row.score;
+  return scores;
+}
+
+function setSkillScores(scores = {}) {
+  const statement = db().prepare(
+    'INSERT INTO skill_scores (skill, score, updated_at) VALUES (?, ?, ?) ON CONFLICT(skill) DO UPDATE SET score = excluded.score, updated_at = excluded.updated_at',
+  );
+  for (const [skill, score] of Object.entries(scores || {})) {
+    if (SKILLS.includes(skill)) statement.run(skill, clamp(score, 0, 100, 0), now());
+  }
+}
+
+function listLessonProgress() {
+  return db().prepare('SELECT lesson_id, stars, best_pct, attempts, completed_at FROM lesson_progress').all();
+}
+
+function upsertLessonProgress(row = {}) {
+  const lessonId = typeof row.lesson_id === 'string' ? row.lesson_id.slice(0, 80) : '';
+  if (!lessonId) throw userError('That lesson could not be saved.');
+  db()
+    .prepare(
+      'INSERT INTO lesson_progress (lesson_id, stars, best_pct, attempts, completed_at, updated_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(lesson_id) DO UPDATE SET stars = excluded.stars, best_pct = excluded.best_pct, attempts = excluded.attempts, completed_at = excluded.completed_at, updated_at = excluded.updated_at',
+    )
+    .run(
+      lessonId,
+      clamp(row.stars, 0, 3, 0),
+      clamp(row.best_pct, 0, 100, 0),
+      clamp(row.attempts, 0, 100000, 0),
+      optionalText(row.completed_at),
+      now(),
+    );
+}
+
+// Several lessons at once, all or nothing: a row that is refused undoes the rows before it.
+function upsertLessonProgressMany(rows = []) {
+  const list = Array.isArray(rows) ? rows.slice(0, 500) : [];
+  db().exec('BEGIN');
+  try {
+    for (const row of list) upsertLessonProgress(row && typeof row === 'object' ? row : {});
+    db().exec('COMMIT');
+  } catch (error) {
+    db().exec('ROLLBACK');
+    throw error;
+  }
+}
+
+function toReview(row) {
+  return {
+    item_key: row.item_key,
+    skill: row.skill,
+    payload: parse(row.payload, {}),
+    ease: row.ease,
+    interval_days: row.interval_days,
+    reps: row.reps,
+    due_at: row.due_at,
+  };
+}
+
+function listReviewItems() {
+  return db().prepare('SELECT * FROM review_items').all().map(toReview);
+}
+
+// A review item needs its key and its question, or the review screen cannot show it. Other values are kept within range.
+function cleanReviewRow(row) {
+  const key = typeof row.item_key === 'string' ? row.item_key.slice(0, 200) : '';
+  if (!key || !row.payload || typeof row.payload !== 'object' || !row.payload.question) return null;
+  const payload = JSON.stringify(row.payload);
+  if (payload.length > MAX_JSON_LENGTH) return null;
+  return {
+    item_key: key,
+    skill: SKILLS.includes(row.skill) ? row.skill : 'language',
+    payload,
+    ease: Math.min(5, Math.max(1.3, Number(row.ease) || 2.5)),
+    interval_days: clamp(row.interval_days, 0, 36500, 0),
+    reps: clamp(row.reps, 0, 100000, 0),
+    due_at: isoTime(row.due_at, now()),
+  };
+}
+
+function upsertReviewItems(rows = []) {
+  const statement = db().prepare(
+    'INSERT INTO review_items (item_key, skill, payload, ease, interval_days, reps, due_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(item_key) DO UPDATE SET skill = excluded.skill, payload = excluded.payload, ease = excluded.ease, interval_days = excluded.interval_days, reps = excluded.reps, due_at = excluded.due_at, updated_at = excluded.updated_at',
+  );
+  for (const raw of Array.isArray(rows) ? rows : []) {
+    const row = cleanReviewRow(raw && typeof raw === 'object' ? raw : {});
+    if (!row) continue;
+    statement.run(row.item_key, row.skill, row.payload, row.ease, row.interval_days, row.reps, row.due_at, now());
+  }
+}
+
+// Practice sets ----------------------------------------------------------------
+
+function toTest(row) {
+  return { ...row, content: parse(row.content, { passages: [], questions: [] }) };
+}
+
+function listMyTests() {
+  return db().prepare('SELECT * FROM tests ORDER BY created_at DESC').all().map(toTest);
+}
+
+function getTest(id) {
+  const row = db().prepare('SELECT * FROM tests WHERE id = ?').get(String(id));
+  return row ? toTest(row) : null;
+}
+
+function insertTest(input = {}) {
+  const id = typeof input.id === 'string' && input.id ? input.id : randomUUID();
+  const content = JSON.stringify(input.content ?? { passages: [], questions: [] });
+  if (content.length > MAX_JSON_LENGTH) throw userError('That practice set is too large to keep.');
+  db()
+    .prepare(
+      'INSERT OR IGNORE INTO tests (id, title, description, kind, skill, level, minutes, content, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    )
+    .run(
+      id,
+      String(input.title ?? 'Practice set').slice(0, 120),
+      String(input.description ?? '').slice(0, 300),
+      input.kind === 'custom' ? 'custom' : 'ai',
+      TEST_SKILLS.includes(input.skill) ? input.skill : 'mixed',
+      LEVELS.includes(input.level) ? input.level : 'B1',
+      clamp(input.minutes, 1, 240, 10),
+      content,
+      isoTime(input.created_at, now()),
+    );
+  return getTest(id);
+}
+
+// Coach chats and their messages ---------------------------------------------------
+
+// A chat's name: one line of plain text, at most 120 characters. An empty name clears it.
+// A chat's mode is a short lower-case name, such as "writing". Anything else is no mode.
+function cleanChatMode(mode) {
+  return typeof mode === 'string' && /^[a-z-]{1,40}$/.test(mode) ? mode : null;
+}
+
+function cleanChatTitle(title) {
+  const text = String(title ?? '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, CHAT_TITLE_MAX);
+  return text || null;
+}
+
+// The files that went with a message: name, kind and size only. At most ten are kept.
+function cleanAttachments(value) {
+  if (!Array.isArray(value)) return [];
+  return value.slice(0, MAX_ATTACHMENTS).flatMap((item) => {
+    if (!item || typeof item !== 'object') return [];
+    const name = String(item.name ?? '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 160);
+    if (!name) return [];
+    const kind = ATTACHMENT_KINDS.includes(item.kind) ? item.kind : 'document';
+    const size = Number(item.size);
+    return [{ name, kind, size: Number.isFinite(size) ? Math.min(2 ** 40, Math.max(0, Math.round(size))) : 0 }];
+  });
+}
+
+const toChat = (row) => ({
+  id: row.id,
+  mode: row.mode ?? null,
+  title: row.title ?? null,
+  archived: Boolean(row.archived),
+  created_at: row.created_at,
+  updated_at: row.updated_at,
+});
+
+const toMessage = (row) => ({
+  id: row.id,
+  chat_id: row.chat_id ?? null,
+  role: row.role === 'assistant' ? 'assistant' : 'user',
+  content: row.content,
+  attachments: cleanAttachments(parse(row.attachments, [])),
+  created_at: row.created_at,
+});
+
+function getChat(id) {
+  const row = db().prepare('SELECT * FROM tutor_chats WHERE id = ?').get(String(id));
+  if (!row) throw userError('This chat could not be found.');
+  return toChat(row);
+}
+
+function listTutorChats() {
+  return db().prepare('SELECT * FROM tutor_chats ORDER BY updated_at DESC').all().map(toChat);
+}
+
+function createTutorChat(id, createdAt, mode) {
+  const wanted = typeof id === 'string' && id ? id : null;
+  if (wanted) {
+    const existing = db().prepare('SELECT * FROM tutor_chats WHERE id = ?').get(wanted);
+    if (existing) return toChat(existing);
+  }
+  if (db().prepare('SELECT COUNT(*) AS count FROM tutor_chats').get().count >= MAX_CHATS) {
+    throw userError('You have reached the limit for chats. Delete some chats and try again.');
+  }
+  const time = isoTime(createdAt, now());
+  const chatId = wanted || randomUUID();
+  db().prepare('INSERT INTO tutor_chats (id, title, archived, mode, created_at, updated_at) VALUES (?, NULL, 0, ?, ?, ?)').run(chatId, cleanChatMode(mode), time, time);
+  return getChat(chatId);
+}
+
+function renameTutorChat(id, title) {
+  getChat(id);
+  db().prepare('UPDATE tutor_chats SET title = ? WHERE id = ?').run(cleanChatTitle(title), String(id));
+  return getChat(id);
+}
+
+function setTutorChatArchived(id, archived) {
+  getChat(id);
+  db().prepare('UPDATE tutor_chats SET archived = ? WHERE id = ?').run(archived ? 1 : 0, String(id));
+  return getChat(id);
+}
+
+// Removes one message: a reply that is written again, or a message that is edited and sent again.
+function deleteTutorMessage(id) {
+  const row = db().prepare('SELECT id FROM tutor_messages WHERE id = ?').get(String(id));
+  if (!row) throw userError('This message could not be found.');
+  db().prepare('DELETE FROM tutor_messages WHERE id = ?').run(String(id));
+}
+
+function deleteTutorChat(id) {
+  getChat(id);
+  db().prepare('DELETE FROM tutor_messages WHERE chat_id = ?').run(String(id));
+  db().prepare('DELETE FROM tutor_chats WHERE id = ?').run(String(id));
+}
+
+// The ids of the chats whose name or messages contain the text. An empty search lists every chat.
+function searchTutorChats(query) {
+  const needle = String(query ?? '')
+    .trim()
+    .toLowerCase();
+  const ids = new Set();
+  for (const chat of db().prepare('SELECT id, title FROM tutor_chats').all()) {
+    if (!needle || String(chat.title ?? '').toLowerCase().includes(needle)) ids.add(chat.id);
+  }
+  if (needle) {
+    for (const message of db().prepare('SELECT chat_id, content FROM tutor_messages WHERE chat_id IS NOT NULL').all()) {
+      if (message.content.toLowerCase().includes(needle)) ids.add(message.chat_id);
+    }
+  }
+  return [...ids];
+}
+
+function listTutor(chatId, limit = 40) {
+  return db()
+    .prepare('SELECT * FROM (SELECT * FROM tutor_messages WHERE chat_id = ? ORDER BY created_at DESC LIMIT ?) ORDER BY created_at ASC')
+    .all(String(chatId), clamp(limit, 1, 200, 40))
+    .map(toMessage);
+}
+
+function addTutor(chatId, role, content, id, createdAt, attachments) {
+  getChat(chatId);
+  const messageId = typeof id === 'string' && id ? id : randomUUID();
+  // A message that is already there keeps its first copy, as the app does.
+  const existing = db().prepare('SELECT * FROM tutor_messages WHERE id = ?').get(messageId);
+  if (existing) return toMessage(existing);
+  const row = {
+    id: messageId,
+    chat_id: String(chatId),
+    role: role === 'assistant' ? 'assistant' : 'user',
+    content: String(content ?? '').slice(0, 24000),
+    attachments: JSON.stringify(cleanAttachments(attachments)),
+    created_at: isoTime(createdAt, now()),
+  };
+  db()
+    .prepare('INSERT INTO tutor_messages (id, chat_id, role, content, attachments, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    .run(row.id, row.chat_id, row.role, row.content, row.attachments, row.created_at);
+  db().prepare('UPDATE tutor_chats SET updated_at = ? WHERE id = ?').run(now(), row.chat_id);
+  return toMessage(row);
+}
+
+// Profile picture: one WebP file of at most 300 KB, kept in the database file.
+function toBuffer(input) {
+  if (input instanceof ArrayBuffer) return Buffer.from(input);
+  if (ArrayBuffer.isView(input)) return Buffer.from(input.buffer, input.byteOffset, input.byteLength);
+  return null;
+}
+
+function isWebp(bytes) {
+  return bytes.length > 12 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP';
+}
+
+function getAvatar() {
+  const row = db().prepare('SELECT data FROM avatar WHERE id = 1').get();
+  return row ? new Uint8Array(row.data) : null;
+}
+
+function setAvatar(input) {
+  getProfile();
+  const bytes = toBuffer(input);
+  if (!bytes || bytes.length === 0 || bytes.length > AVATAR_MAX_BYTES) {
+    throw userError('That picture is too large. Choose a smaller one.');
+  }
+  if (!isWebp(bytes)) throw userError('That picture could not be saved. Try another one.');
+  const stamp = now();
+  db()
+    .prepare(
+      'INSERT INTO avatar (id, data, updated_at) VALUES (1, ?, ?) ON CONFLICT(id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at',
+    )
+    .run(bytes, stamp);
+  db().prepare('UPDATE profile SET avatar_updated_at = ?').run(stamp);
+  return getProfile();
+}
+
+function clearAvatar() {
+  db().prepare('DELETE FROM avatar').run();
+  db().prepare('UPDATE profile SET avatar_updated_at = NULL').run();
+  return getProfile();
+}
+
+// The profile banner: a WebP picture kept on this device, like the profile picture.
+function getBanner() {
+  const row = db().prepare('SELECT data FROM banner WHERE id = 1').get();
+  return row ? new Uint8Array(row.data) : null;
+}
+
+function setBanner(input) {
+  getProfile();
+  const bytes = toBuffer(input);
+  if (!bytes || bytes.length === 0 || bytes.length > BANNER_MAX_BYTES) {
+    throw userError('That banner is too large. Choose a smaller picture.');
+  }
+  if (!isWebp(bytes)) throw userError('That banner could not be saved. Try another picture.');
+  const stamp = now();
+  db()
+    .prepare(
+      'INSERT INTO banner (id, data, updated_at) VALUES (1, ?, ?) ON CONFLICT(id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at',
+    )
+    .run(bytes, stamp);
+  db().prepare('UPDATE profile SET banner_updated_at = ?').run(stamp);
+  return getProfile();
+}
+
+function clearBanner() {
+  db().prepare('DELETE FROM banner').run();
+  db().prepare('UPDATE profile SET banner_updated_at = NULL').run();
+  return getProfile();
+}
+
+// My library: learning files (PDF, TXT, Markdown) keep their bytes and extracted text; links keep their details.
+const LIBRARY_KINDS = ['pdf', 'txt', 'md'];
+const LIBRARY_FILE_MAX_BYTES = 20 * 1024 * 1024;
+const LIBRARY_TEXT_MAX = 400000;
+const LIBRARY_FILE_FIELDS = 'id, name, kind, mime_type, size_bytes, pages, created_at, updated_at';
+const LIBRARY_LINK_FIELDS = 'id, url, title, platform, category, note, created_at, updated_at';
+
+function listLibraryFiles() {
+  return db().prepare(`SELECT ${LIBRARY_FILE_FIELDS} FROM library_files ORDER BY created_at DESC`).all();
+}
+
+function getLibraryFileData(id) {
+  const row = db().prepare('SELECT data FROM library_files WHERE id = ?').get(String(id));
+  return row ? new Uint8Array(row.data) : null;
+}
+
+function getLibraryText(id) {
+  const row = db().prepare('SELECT extracted_text AS text FROM library_files WHERE id = ?').get(String(id));
+  return row ? row.text : '';
+}
+
+function insertLibraryFile(input = {}) {
+  if (!LIBRARY_KINDS.includes(input.kind)) throw userError('Only PDF, TXT and Markdown files can be kept in the library.');
+  const bytes = toBuffer(input.data);
+  if (!bytes || bytes.length === 0 || bytes.length > LIBRARY_FILE_MAX_BYTES) {
+    throw userError('That file is too large. Choose one under 20 MB.');
+  }
+  const id = typeof input.id === 'string' && input.id ? input.id : randomUUID();
+  const createdAt = typeof input.created_at === 'string' && input.created_at ? input.created_at : now();
+  const pages = input.pages === null || input.pages === undefined ? null : clamp(input.pages, 0, 5000, 0);
+  db()
+    .prepare(
+      'INSERT OR IGNORE INTO library_files (id, name, kind, mime_type, size_bytes, data, extracted_text, pages, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    )
+    .run(
+      id,
+      String(input.name || 'File').slice(0, 200),
+      input.kind,
+      MIME_BY_KIND[input.kind],
+      bytes.length,
+      bytes,
+      String(input.extracted_text || '').slice(0, LIBRARY_TEXT_MAX),
+      pages,
+      createdAt,
+      now(),
+    );
+  return db().prepare(`SELECT ${LIBRARY_FILE_FIELDS} FROM library_files WHERE id = ?`).get(id);
+}
+
+// Saves new text for a TXT or Markdown file: its bytes and the text the tutor reads are replaced, and its name and place stay.
+function updateLibraryFile(id, input = {}) {
+  const fileId = String(id);
+  const current = db().prepare('SELECT kind FROM library_files WHERE id = ?').get(fileId);
+  if (!current) throw userError('That file is no longer in your library.');
+  if (current.kind === 'pdf') throw userError('A PDF keeps its pages, so its text is saved as a new file.');
+  const bytes = toBuffer(input.data);
+  if (!bytes || bytes.length > LIBRARY_FILE_MAX_BYTES) throw userError('That file is too large. Choose one under 20 MB.');
+  // An empty file cannot be stored (the database keeps no empty bytes), so the text stays as it was.
+  if (bytes.length === 0) throw userError('The text is empty. Write something before you save.');
+  db()
+    .prepare('UPDATE library_files SET data = ?, size_bytes = ?, extracted_text = ?, updated_at = ? WHERE id = ?')
+    .run(bytes, bytes.length, String(input.extracted_text || '').slice(0, LIBRARY_TEXT_MAX), now(), fileId);
+  return db().prepare(`SELECT ${LIBRARY_FILE_FIELDS} FROM library_files WHERE id = ?`).get(fileId);
+}
+
+function deleteLibraryFile(id) {
+  db().prepare('DELETE FROM library_files WHERE id = ?').run(String(id));
+  return true;
+}
+
+function listLibraryLinks() {
+  return db().prepare(`SELECT ${LIBRARY_LINK_FIELDS} FROM library_links ORDER BY created_at DESC`).all();
+}
+
+function cleanLibraryLink(input = {}) {
+  const url = String(input.url || '');
+  if (!/^https:\/\/[^\s]+$/.test(url) || url.length > 2000) throw userError('Paste a web link that starts with https://.');
+  return {
+    url,
+    title: String(input.title ?? '').slice(0, 200),
+    platform: String(input.platform || 'other').slice(0, 40),
+    category: String(input.category || 'General').slice(0, 40),
+    note: String(input.note ?? '').slice(0, 500),
+  };
+}
+
+function insertLibraryLink(input = {}) {
+  const link = cleanLibraryLink(input);
+  const id = typeof input.id === 'string' && input.id ? input.id : randomUUID();
+  const createdAt = typeof input.created_at === 'string' && input.created_at ? input.created_at : now();
+  db()
+    .prepare(
+      'INSERT OR IGNORE INTO library_links (id, url, title, platform, category, note, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    )
+    .run(id, link.url, link.title, link.platform, link.category, link.note, createdAt, now());
+  return db().prepare(`SELECT ${LIBRARY_LINK_FIELDS} FROM library_links WHERE id = ?`).get(id);
+}
+
+function updateLibraryLink(id, patchInput = {}) {
+  const patch = patchInput && typeof patchInput === 'object' ? patchInput : {};
+  const current = db().prepare(`SELECT ${LIBRARY_LINK_FIELDS} FROM library_links WHERE id = ?`).get(String(id));
+  if (!current) throw userError('That link is no longer in your library.');
+  const title = patch.title === undefined ? current.title : String(patch.title ?? '').slice(0, 200);
+  const category = patch.category === undefined ? current.category : String(patch.category || 'General').slice(0, 40);
+  const note = patch.note === undefined ? current.note : String(patch.note ?? '').slice(0, 500);
+  db().prepare('UPDATE library_links SET title = ?, category = ?, note = ?, updated_at = ? WHERE id = ?').run(title, category, note, now(), current.id);
+  return db().prepare(`SELECT ${LIBRARY_LINK_FIELDS} FROM library_links WHERE id = ?`).get(current.id);
+}
+
+function deleteLibraryLink(id) {
+  db().prepare('DELETE FROM library_links WHERE id = ?').run(String(id));
+  return true;
+}
+
+// The weekly league on this device: the XP of the caller's runs in the last days. Friends need an online account.
+function listLeague(days = 7) {
+  const size = clamp(days, 1, 31, 7);
+  const profile = getProfile();
+  const since = new Date(Date.now() - size * 86400000).toISOString();
+  const row = db().prepare('SELECT COALESCE(SUM(xp), 0) AS xp FROM attempts WHERE created_at >= ?').get(since);
+  return [
+    {
+      user_id: profile.id,
+      username: profile.username,
+      display_name: profile.display_name,
+      avatar_color: profile.avatar_color,
+      avatar_path: null,
+      avatar_updated_at: null,
+      week_xp: Math.max(0, Number(row.xp) || 0),
+    },
+  ];
+}
+
+// Decks and flashcards (2.0.0). The same rules and limits as src/lib/data/rules.ts, which must change with these.
+const DECK_LIMIT = 100;
+const CARD_LIMIT = 5000;
+const CARD_BATCH_LIMIT = 500;
+const DECK_COLOURS = ['green', 'blue', 'violet', 'sun', 'red', 'slate'];
+const CARD_STATES = ['new', 'learning', 'review'];
+
+function cleanDeckFields(input, current) {
+  const source = input && typeof input === 'object' ? input : {};
+  const title = source.title === undefined && current ? current.title : String(source.title ?? '').trim().slice(0, 80);
+  if (!title) throw userError('Give the deck a name of 1 to 80 characters.');
+  const description = source.description === undefined && current ? current.description : String(source.description ?? '').slice(0, 300);
+  const colour =
+    source.colour === undefined && current ? current.colour : DECK_COLOURS.includes(source.colour) ? source.colour : current ? current.colour : 'green';
+  return { title, description, colour };
+}
+
+function cleanCardText(input, current) {
+  const source = input && typeof input === 'object' ? input : {};
+  const front = source.front === undefined && current ? current.front : String(source.front ?? '').trim().slice(0, 300);
+  const back = source.back === undefined && current ? current.back : String(source.back ?? '').trim().slice(0, 600);
+  if (!front || !back) throw userError('A card needs a front and a back.');
+  const note = source.note === undefined && current ? current.note : String(source.note ?? '').trim().slice(0, 300);
+  return { front, back, note };
+}
+
+function cleanCardStats(input, at, current) {
+  const source = input && typeof input === 'object' ? input : {};
+  const ease = Number(source.ease);
+  return {
+    state: CARD_STATES.includes(source.state) ? source.state : current ? current.state : 'new',
+    ease: Number.isFinite(ease) ? Math.min(4, Math.max(1.3, Math.round(ease * 100) / 100)) : current ? current.ease : 2.5,
+    interval_days: clamp(source.interval_days, 0, 36500, current ? current.interval_days : 0),
+    reps: clamp(source.reps, 0, 100000, current ? current.reps : 0),
+    lapses: clamp(source.lapses, 0, 100000, current ? current.lapses : 0),
+    due_at: isoTime(source.due_at, current ? current.due_at : at),
+    last_review_at:
+      source.last_review_at === undefined
+        ? current
+          ? current.last_review_at
+          : null
+        : source.last_review_at
+          ? isoTime(source.last_review_at, at)
+          : null,
+  };
+}
+
+function getDeck(id) {
+  return db().prepare('SELECT * FROM decks WHERE id = ?').get(String(id)) ?? null;
+}
+
+function getCard(id) {
+  return db().prepare('SELECT * FROM cards WHERE id = ?').get(String(id)) ?? null;
+}
+
+function listDecks() {
+  return db().prepare('SELECT * FROM decks ORDER BY created_at DESC').all();
+}
+
+function createDeck(input = {}) {
+  if (Number(db().prepare('SELECT COUNT(*) AS total FROM decks').get().total) >= DECK_LIMIT) {
+    throw userError('You can have 100 decks. Delete one to make another.');
+  }
+  const existing = typeof input.id === 'string' && input.id ? getDeck(input.id) : null;
+  if (existing) return existing;
+  const profile = getProfile();
+  const fields = cleanDeckFields(input, null);
+  const at = isoTime(input.created_at, now());
+  const id = typeof input.id === 'string' && input.id ? input.id : randomUUID();
+  db()
+    .prepare('INSERT INTO decks (id, owner_id, title, description, colour, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    .run(id, profile.id, fields.title, fields.description, fields.colour, at, at);
+  return getDeck(id);
+}
+
+function updateDeck(id, patch = {}) {
+  const current = getDeck(id);
+  if (!current) throw userError('That deck could not be found.');
+  const fields = cleanDeckFields(patch, current);
+  db()
+    .prepare('UPDATE decks SET title = ?, description = ?, colour = ?, updated_at = ? WHERE id = ?')
+    .run(fields.title, fields.description, fields.colour, now(), current.id);
+  return getDeck(current.id);
+}
+
+function deleteDeck(id) {
+  db().prepare('DELETE FROM cards WHERE deck_id = ?').run(String(id));
+  db().prepare('DELETE FROM decks WHERE id = ?').run(String(id));
+}
+
+function listCards(deckId) {
+  return db().prepare('SELECT * FROM cards WHERE deck_id = ? ORDER BY created_at ASC').all(String(deckId));
+}
+
+function createCards(deckId, rows = []) {
+  const deck = getDeck(deckId);
+  if (!deck) throw userError('That deck could not be found.');
+  const list = Array.isArray(rows) ? rows : [];
+  if (list.length > CARD_BATCH_LIMIT) throw userError('Add up to 500 cards at a time.');
+  if (Number(db().prepare('SELECT COUNT(*) AS total FROM cards').get().total) + list.length > CARD_LIMIT) {
+    throw userError('You can have 5000 cards. Delete some to add more.');
+  }
+  const profile = getProfile();
+  const stamp = now();
+  const made = list.map((row) => {
+    const at = isoTime(row.created_at, stamp);
+    return {
+      id: typeof row.id === 'string' && row.id ? row.id : randomUUID(),
+      deck_id: deck.id,
+      owner_id: profile.id,
+      ...cleanCardText(row, null),
+      ...cleanCardStats({ due_at: row.due_at }, at, null),
+      created_at: at,
+      updated_at: at,
+    };
+  });
+  db().exec('BEGIN');
+  try {
+    for (const card of made) {
+      db()
+        .prepare(
+          'INSERT INTO cards (id, deck_id, owner_id, front, back, note, state, ease, interval_days, reps, lapses, due_at, last_review_at, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        )
+        .run(
+          card.id,
+          card.deck_id,
+          card.owner_id,
+          card.front,
+          card.back,
+          card.note,
+          card.state,
+          card.ease,
+          card.interval_days,
+          card.reps,
+          card.lapses,
+          card.due_at,
+          card.last_review_at,
+          card.created_at,
+          card.updated_at,
+        );
+    }
+    db().exec('COMMIT');
+  } catch (error) {
+    db().exec('ROLLBACK');
+    throw error;
+  }
+  return made.map((card) => getCard(card.id));
+}
+
+function updateCard(id, patch = {}) {
+  const current = getCard(id);
+  if (!current) throw userError('That card could not be found.');
+  const text = cleanCardText(patch, current);
+  const at = now();
+  const stats = cleanCardStats(patch, at, current);
+  db()
+    .prepare(
+      'UPDATE cards SET front = ?, back = ?, note = ?, state = ?, ease = ?, interval_days = ?, reps = ?, lapses = ?, due_at = ?, last_review_at = ?, updated_at = ? WHERE id = ?',
+    )
+    .run(
+      text.front,
+      text.back,
+      text.note,
+      stats.state,
+      stats.ease,
+      stats.interval_days,
+      stats.reps,
+      stats.lapses,
+      stats.due_at,
+      stats.last_review_at,
+      at,
+      current.id,
+    );
+  return getCard(current.id);
+}
+
+function deleteCard(id) {
+  db().prepare('DELETE FROM cards WHERE id = ?').run(String(id));
+}
+
+function listDueCards(at, limit = 50) {
+  const cutoff = isoTime(at, now());
+  const size = clamp(limit, 1, 500, 50);
+  return db().prepare('SELECT * FROM cards WHERE due_at <= ? ORDER BY due_at ASC LIMIT ?').all(cutoff, size);
+}
+
+// Only these actions can be called from the interface.
+const METHODS = {
+  getProfile,
+  updateProfile,
+  listLeague,
+  listDecks,
+  createDeck,
+  updateDeck,
+  deleteDeck,
+  listCards,
+  createCards,
+  updateCard,
+  deleteCard,
+  listDueCards,
+  listAttempts,
+  countAttempts,
+  getAttempt,
+  insertAttempt,
+  getSkillScores,
+  setSkillScores,
+  listLessonProgress,
+  upsertLessonProgress,
+  upsertLessonProgressMany,
+  listReviewItems,
+  upsertReviewItems,
+  listMyTests,
+  getTest,
+  insertTest,
+  listTutorChats,
+  createTutorChat,
+  renameTutorChat,
+  setTutorChatArchived,
+  deleteTutorChat,
+  deleteTutorMessage,
+  searchTutorChats,
+  listTutor,
+  addTutor,
+  getAvatar,
+  setAvatar,
+  clearAvatar,
+  getBanner,
+  setBanner,
+  clearBanner,
+  listLibraryFiles,
+  getLibraryFileData,
+  getLibraryText,
+  insertLibraryFile,
+  updateLibraryFile,
+  deleteLibraryFile,
+  listLibraryLinks,
+  insertLibraryLink,
+  updateLibraryLink,
+  deleteLibraryLink,
+};
+
+function call(method, args) {
+  // Only the listed names count. Inherited names such as "constructor" are not actions.
+  if (!Object.hasOwn(METHODS, method)) throw userError('That action is not available right now.');
+  const handler = METHODS[method];
+  return handler(...(Array.isArray(args) ? args : []));
+}
+
+module.exports = { call };
