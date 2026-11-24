@@ -25,9 +25,42 @@ const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256];
 const WEBP = { quality: 92, alphaQuality: 100, effort: 6 };
 const CLEAR = { r: 0, g: 0, b: 0, alpha: 0 };
 
-// The logo without its transparent margin, so every size uses the mark's real shape.
+// The logo cut to the mark itself, so every size uses the mark's real shape. The mark is the pixels that are visible and
+// not white; the white around it becomes see-through. sharp's trim cannot find the mark on a see-through background,
+// so the bounds are read from the pixels.
 async function loadLogo() {
-  return sharp(await readFile(LOGO_SOURCE)).trim().png().toBuffer();
+  const { data, info } = await sharp(await readFile(LOGO_SOURCE)).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  let left = info.width;
+  let top = info.height;
+  let right = -1;
+  let bottom = -1;
+  for (let y = 0; y < info.height; y += 1) {
+    for (let x = 0; x < info.width; x += 1) {
+      const i = (y * info.width + x) * 4;
+      const mark = data[i + 3] >= 20 && (data[i] < 245 || data[i + 1] < 245 || data[i + 2] < 245);
+      if (!mark) continue;
+      if (x < left) left = x;
+      if (x > right) right = x;
+      if (y < top) top = y;
+      if (y > bottom) bottom = y;
+    }
+  }
+  if (right < 0) throw new Error('The logo has no mark to show.');
+  const width = right - left + 1;
+  const height = bottom - top + 1;
+  const cut = Buffer.alloc(width * height * 4);
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const from = ((top + y) * info.width + (left + x)) * 4;
+      const to = (y * width + x) * 4;
+      const white = data[from] >= 245 && data[from + 1] >= 245 && data[from + 2] >= 245;
+      cut[to] = data[from];
+      cut[to + 1] = data[from + 1];
+      cut[to + 2] = data[from + 2];
+      cut[to + 3] = white ? 0 : data[from + 3];
+    }
+  }
+  return sharp(cut, { raw: { width, height, channels: 4 } }).png().toBuffer();
 }
 
 async function fitMark(mark, box) {
