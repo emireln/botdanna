@@ -125,7 +125,7 @@
   .turn__bubble {
     max-width: 80%;
     padding: 12px 16px;
-    border-radius: 16px 16px 4px 16px;
+    border-radius: 13px 13px 3px 13px;
     background: var(--primary-600);
     color: #fff;
     font-size: 16px;
@@ -148,7 +148,7 @@
     height: 30px;
     display: grid;
     place-items: center;
-    border-radius: 9px;
+    border-radius: 7px;
     background: var(--primary-50);
     border: 1px solid var(--primary-100);
   }
@@ -156,7 +156,7 @@
   .turn__mark {
     width: 11px;
     height: 11px;
-    border-radius: 3px;
+    border-radius: 2px;
     background: var(--primary);
     transform: rotate(45deg);
   }
@@ -197,7 +197,7 @@
 
   .reply-text code {
     padding: 1px 5px;
-    border-radius: 5px;
+    border-radius: 4px;
     background: var(--surface-2);
     font-size: 0.92em;
   }
@@ -219,7 +219,7 @@
     gap: 6px;
     padding: 5px 9px;
     border: 0;
-    border-radius: 8px;
+    border-radius: 6px;
     background: none;
     color: var(--muted);
     font-size: 13px;
@@ -683,7 +683,7 @@
     height: 36px;
     display: grid;
     place-items: center;
-    border-radius: 10px;
+    border-radius: 8px;
     background: var(--primary-100);
     color: var(--primary-700);
   }
@@ -814,7 +814,7 @@
     gap: 4px;
     padding: 8px 12px 6px;
     border: 1px solid var(--line-2);
-    border-radius: 18px;
+    border-radius: 14px;
     background: var(--canvas);
     box-shadow: var(--shadow-sm);
   }
@@ -875,7 +875,7 @@
     flex: none;
     width: 40px;
     height: 40px;
-    border-radius: 12px;
+    border-radius: 10px;
     color: #fff;
   }
 
@@ -951,5 +951,235 @@
     .coach-bar__tools .btn--sm {
       padding-inline: 8px;
     }
+  }
+
+  /* ---------- The coach's plan for today, the saved words, find in the chat and the writing trend ---------- */
+  .today-plan {
+    display: grid;
+    gap: 10px;
+  }
+
+  .today-plan__list,
+  .word-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .plan-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--canvas);
+    box-shadow: var(--shadow-sm);
+    text-align: left;
+    cursor: pointer;
+    transition:
+      border-color 0.2s var(--ease),
+      background-color 0.2s var(--ease);
+  }
+
+  .plan-item:hover:not(:disabled) {
+    border-color: var(--primary);
+    background: var(--primary-50);
+  }
+
+  .plan-item:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  .plan-item--urgent {
+    border-color: var(--primary-100);
+    background: var(--primary-50);
+  }
+
+  .plan-item__text {
+    display: grid;
+    flex: 1;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .plan-item__title {
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--ink);
+  }
+
+  .plan-item__detail {
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
+
+  .plan-item__tag {
+    flex: none;
+    padding: 3px 9px;
+    border-radius: var(--radius-pill);
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .plan-item__go {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    color: var(--primary);
+  }
+
+  .saved-words {
+    display: grid;
+    gap: 12px;
+  }
+
+  .saved-words__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  .saved-words__count {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .saved-words__quiz {
+    justify-self: start;
+  }
+
+  .word-list__item {
+    display: grid;
+    gap: 2px;
+    padding: 10px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--canvas);
+  }
+
+  .word-list__word {
+    font-size: 15px;
+    font-weight: 650;
+    color: var(--ink);
+  }
+
+  .word-list__meaning {
+    font-size: 13.5px;
+    color: var(--ink-2);
+  }
+
+  .word-list__example {
+    font-size: 13.5px;
+    font-style: italic;
+    color: var(--muted);
+  }
+
+  .coach__turn {
+    border-radius: 11px;
+    scroll-margin-block: 96px;
+  }
+
+  .coach__turn.is-find-current {
+    outline: 2px solid var(--primary);
+    outline-offset: 6px;
+  }
+
+  .chat-find {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--canvas);
+  }
+
+  .chat-find__field {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+  }
+
+  .chat-find__count {
+    min-width: 72px;
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .writing-trend {
+    display: grid;
+    gap: 12px;
+    padding: 16px 18px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--canvas);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .writing-trend__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+
+  .writing-trend__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--ink);
+  }
+
+  .writing-trend__note {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .writing-trend__bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    height: 128px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .writing-trend__item {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    height: 100%;
+    max-width: 64px;
+  }
+
+  .writing-trend__value {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+
+  .writing-trend__bar {
+    width: 100%;
+    max-height: 100px;
+    border-radius: 6px 6px 3px 3px;
+    background: var(--primary);
   }
 }

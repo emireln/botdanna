@@ -1,13 +1,15 @@
-// The coach's home: what the learner is working on, the ways to work with the coach (the modes), a few questions to
-// start from, and the recent chats. It is what a learner sees before a chat starts.
+// The coach's home: today's plan, what the learner is working on, the ways to work with the coach (the modes), a few
+// questions to start from, the words they saved, and the recent chats. It is what a learner sees before a chat starts.
 import type { ComponentType } from 'react';
-import { BookOpen, ListChecks, Languages, MessageCircle, Mic, PenLine, Radio, RefreshCw, Target, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, ListChecks, Languages, MessageCircle, Mic, PenLine, Radio, RefreshCw, Target, Users } from 'lucide-react';
 import { coachMode, COACH_MODES, type CoachModeId, type ModeIcon } from '../lib/coachModes';
 import { LIVE_TALK_ENABLED } from '../lib/features';
 import { roleplayModeId, SCENARIOS } from '../lib/scenarios';
 import { tn } from '../lib/i18n';
 import { useT } from '../lib/i18n/react';
 import { daysUntil } from '../lib/progress';
+import type { SavedWord } from '../lib/savedWords';
+import { todayPlan, type PlanItem } from '../lib/todayPlan';
 import { SKILL_LABEL, type Goal, type Level, type Skill, type TutorChatRow } from '../lib/types';
 
 const ICONS: Record<ModeIcon, ComponentType<{ 'aria-hidden'?: boolean }>> = {
@@ -23,6 +25,9 @@ const ICONS: Record<ModeIcon, ComponentType<{ 'aria-hidden'?: boolean }>> = {
   repeat: RefreshCw,
 };
 
+/** How many saved words the home lists. The rest are kept, and the count says how many there are. */
+const WORDS_SHOWN = 8;
+
 export interface CoachHomeProps {
   level: Level;
   goal: Goal;
@@ -31,8 +36,12 @@ export interface CoachHomeProps {
   examName: string | null;
   /** The latest score in each skill, out of 100. */
   skills: Partial<Record<Skill, number>>;
-  /** How many answers are waiting for review. */
+  /** How many answers are waiting for review, saved words included. */
   reviewCount: number;
+  /** The words the coach saved for review, in alphabetical order. */
+  savedWords: readonly SavedWord[];
+  /** Whole days since the last writing check, or null when there has been none. */
+  daysSinceWriting: number | null;
   /** The newest chats that are not archived. */
   recentChats: TutorChatRow[];
   /** A few questions to start from, picked for this visit. */
@@ -52,6 +61,8 @@ export function CoachHome({
   examName,
   skills,
   reviewCount,
+  savedWords,
+  daysSinceWriting,
   recentChats,
   starters,
   busy,
@@ -67,6 +78,42 @@ export function CoachHome({
   const goalText = goal === 'toefl' ? t('the TOEFL iBT, target {score}', { score: targetScore }) : t('general English');
   const freeMode = coachMode('chat');
   const FreeIcon = ICONS[freeMode.icon];
+  const plan = todayPlan({ reviewCount, savedWords: savedWords.length, examDays: days, weakest, daysSinceWriting });
+
+  // Each step of the plan says what it is for, in the words the learner reads.
+  const planText = (item: PlanItem): { title: string; detail: string } => {
+    switch (item.id) {
+      case 'review':
+        return {
+          title: tn('Review {count} answer', 'Review {count} answers', item.count ?? 0, { count: item.count ?? 0 }),
+          detail: t('Missed answers and saved words come back here before you forget them.'),
+        };
+      case 'exam':
+        return { title: t('Practise one exam task'), detail: t('Your exam is close: one task, scored like the real one.') };
+      case 'write':
+        return { title: t('Check a short text you wrote'), detail: t('Write a few sentences, then take the fixes you agree with.') };
+      case 'skill':
+        return {
+          title: t('Practise {skill}', { skill: t(SKILL_LABEL[weakest ?? 'writing']) }),
+          detail: t('Your weakest skill right now.'),
+        };
+      case 'words':
+        return {
+          title: tn('Quiz yourself on {count} saved word', 'Quiz yourself on {count} saved words', item.count ?? 0, { count: item.count ?? 0 }),
+          detail: t('The coach asks about the words you saved.'),
+        };
+      default:
+        return { title: t('Learn five words for your level'), detail: t('New words, with examples you can save.') };
+    }
+  };
+
+  const runPlan = (item: PlanItem) => {
+    const { action } = item;
+    if (action.kind === 'mode') onMode(action.mode);
+    else if (action.kind === 'navigate') onNavigate(action.to);
+    else if (action.kind === 'skill') onStarter(t('Help me improve my weakest skill, {skill}, with a short practice.', { skill: t(SKILL_LABEL[action.skill]) }));
+    else onStarter(t('Quiz me on the words I saved, one at a time.'));
+  };
 
   return (
     <section className="coach-home" aria-label={t('Your coach')}>
@@ -75,6 +122,29 @@ export function CoachHome({
         <h2 className="coach-home__title">{t('What would you like to work on?')}</h2>
         <p className="coach-home__lead">{t('Level {level}, studying for {goal}.', { level, goal: goalText })}</p>
       </div>
+
+      <section className="today-plan" aria-labelledby="today-plan-title">
+        <h3 className="coach-home__label" id="today-plan-title">
+          {t('Your plan for today')}
+        </h3>
+        <ul className="today-plan__list">
+          {plan.map((item) => {
+            const copy = planText(item);
+            return (
+              <li key={item.id}>
+                <button type="button" className={`plan-item${item.urgent ? ' plan-item--urgent' : ''}`} onClick={() => runPlan(item)} disabled={busy}>
+                  <span className="plan-item__text">
+                    <span className="plan-item__title">{copy.title}</span>
+                    <span className="plan-item__detail">{copy.detail}</span>
+                  </span>
+                  {item.urgent && <span className="plan-item__tag">{t('Now')}</span>}
+                  <ArrowRight className="plan-item__go" aria-hidden="true" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
 
       <div className="coach-home__focus">
         <button type="button" className="focus-card" onClick={() => onNavigate('/setup')}>
@@ -111,6 +181,29 @@ export function CoachHome({
           <span className="focus-card__value">{reviewCount}</span>
         </button>
       </div>
+
+      {savedWords.length > 0 && (
+        <section className="saved-words" aria-labelledby="saved-words-title">
+          <div className="saved-words__head">
+            <h3 className="coach-home__label" id="saved-words-title">
+              {t('My words')}
+            </h3>
+            <span className="saved-words__count">{tn('{count} word saved', '{count} words saved', savedWords.length, { count: savedWords.length })}</span>
+          </div>
+          <ul className="word-list">
+            {savedWords.slice(0, WORDS_SHOWN).map((item) => (
+              <li key={item.word} className="word-list__item">
+                <span className="word-list__word">{item.word}</span>
+                {item.meaning && <span className="word-list__meaning">{item.meaning}</span>}
+                <span className="word-list__example">{item.example}</span>
+              </li>
+            ))}
+          </ul>
+          <button type="button" className="btn btn--ghost btn--sm saved-words__quiz" onClick={() => onStarter(t('Quiz me on the words I saved, one at a time.'))} disabled={busy}>
+            {t('Quiz me on my words')}
+          </button>
+        </section>
+      )}
 
       <h3 className="coach-home__label">{t('Choose a way to work')}</h3>
       <div className="mode-grid">

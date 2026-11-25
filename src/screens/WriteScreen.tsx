@@ -1,15 +1,17 @@
 // The writing check (2.0.0): write a text, check it, and take or leave each suggestion. With an AI key a model finds the
 // issues and writes the reasons; without one, the local rules find the basics. A check is saved as a practice run.
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PenLine, Sparkles } from 'lucide-react';
 import { Field, Notice, PageHeader, ProgressBar } from '../components/ui';
+import { WritingTrend } from '../components/WritingTrend';
 import { errorText } from '../lib/bridge';
 import { extractJson } from '../lib/ai';
 import { replyLanguage } from '../lib/i18n';
 import { useT, type Translate } from '../lib/i18n/react';
 import { applyIssue, localCheck, parseCheck, WRITING_CHECK_XP, WRITING_MAX_WORDS, WRITING_MIN_WORDS, WRITING_REF, wordCount, writingCheckRequest, type CheckResult, type Issue, type IssueCategory, type Tone } from '../lib/writingCheck';
 import { localDate, nextStreak } from '../lib/progress';
+import { writingRuns, type WritingRun } from '../lib/writingHistory';
 import { useAI } from '../state/ai';
 import { useAppData } from '../state/appData';
 import { useAuth } from '../state/auth';
@@ -73,11 +75,28 @@ export function WriteScreen() {
   const [result, setResult] = useState<CheckResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // The checks saved before, newest first. A new check is counted again, so the trend shows it at once.
+  const [runs, setRuns] = useState<WritingRun[]>([]);
+  const [saved, setSaved] = useState(0);
   const words = wordCount(text);
   const tooShort = words < WRITING_MIN_WORDS;
   const tooLong = words > WRITING_MAX_WORDS;
   const aiOn = ready && Boolean(selection);
   const segments = useMemo(() => (result ? segmentsOf(text, result.issues) : []), [text, result]);
+
+  useEffect(() => {
+    if (!backend) return undefined;
+    let cancelled = false;
+    backend
+      .listAttempts(30, 'practice')
+      .then((rows) => {
+        if (!cancelled) setRuns(writingRuns(rows));
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [backend, saved]);
 
   // A check is saved as a practice run: it counts for the profile, the league and the achievements.
   const saveRun = async (next: CheckResult) => {
@@ -94,6 +113,7 @@ export function WriteScreen() {
         duration_s: 0,
         xp: WRITING_CHECK_XP,
       });
+      setSaved((count) => count + 1);
       if (profile) {
         const today = localDate();
         await patchProfile({ xp: profile.xp + WRITING_CHECK_XP, streak: nextStreak(profile.last_active, profile.streak, today), last_active: today });
@@ -174,6 +194,8 @@ export function WriteScreen() {
         {tooShort && text.trim() && <p className="small muted">{t('Write at least {count} words to check.', { count: WRITING_MIN_WORDS })}</p>}
 
         {error && <Notice tone="error">{t(error)}</Notice>}
+
+        <WritingTrend runs={runs} />
 
         {result && (
           <section className="write-result" aria-label={t('Result')}>

@@ -1,5 +1,6 @@
 // What the coach knows about the learner, as a few plain lines for the model: the level and goal, the exam and how
-// many days are left, the skill scores, and the answers the learner got wrong. Only learning facts go here: no name,
+// many days are left, the skill scores, the writing checks, the words saved for review and the answers the learner got
+// wrong. Only learning facts go here: no name,
 // no email, no account details. Pure functions, so the rules are tested without the screen.
 import { clozeAnswers } from './grading';
 import { SKILLS, type Goal, type Level, type ReviewRow, type Skill } from './types';
@@ -12,10 +13,16 @@ export interface LearnerFacts {
   mistakes: ReviewRow[];
   /** Today as YYYY-MM-DD, so the days to the exam are counted from the same day as the screen. */
   today: string;
+  /** The scores of the latest writing checks, out of 100, newest first. Optional: the context works without them. */
+  writingScores?: number[];
+  /** The words the coach saved for review, in alphabetical order. Optional. */
+  savedWords?: string[];
 }
 
 const MAX_CONTEXT = 1400;
 const MAX_MISTAKES = 6;
+const MAX_WRITING = 5;
+const MAX_SAVED = 8;
 const MAX_TEXT = 110;
 
 function clip(text: string, max: number): string {
@@ -61,6 +68,17 @@ export function learnerContext(facts: LearnerFacts): string {
     const scores = scored.map((skill) => `${skill} ${Math.round(skills[skill] ?? 0)}`).join(', ');
     const weakest = scored.reduce((low, skill) => ((skills[skill] ?? 0) < (skills[low] ?? 0) ? skill : low), scored[0]);
     lines.push(`- Skill scores out of 100: ${scores}. Weakest: ${weakest}.`);
+  }
+
+  // The writing scores and the saved words come before the answers to review, so a long list cannot push them out.
+  const writing = facts.writingScores ?? [];
+  if (writing.length > 0) {
+    lines.push(`- Writing checks, newest first, out of 100: ${writing.slice(0, MAX_WRITING).map((score) => Math.round(score)).join(', ')}.`);
+  }
+
+  const saved = facts.savedWords ?? [];
+  if (saved.length > 0) {
+    lines.push(`- Words saved for review (${saved.length} in all): ${saved.slice(0, MAX_SAVED).map((word) => clip(word, 40)).join(', ')}.`);
   }
 
   if (mistakes.length > 0) {

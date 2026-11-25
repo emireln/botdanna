@@ -40,6 +40,9 @@ export function coachSystem(profile: { level: Level; goal: Goal; target_score: n
     'When the cause of a mistake is not clear, ask a short question about what the learner meant before you explain. A good question teaches more than a rule.',
     'Use the learner context to choose examples, to notice patterns in their mistakes, to suggest the next best step for today, and to say when an answer to review comes back. Never invent a score, a date or a fact about the learner that the context does not give.',
     'Keep replies focused and readable: short paragraphs, and lists only when they help. No tables and no emoji.',
+    'Do not repeat a correction the learner already saw in this chat. If they make the same mistake again, say that it is the same one, and show the fix once more.',
+    'When the learner context lists words saved for review, use one or two of them in an example or a quick question, when they fit the topic.',
+    'When the learner context shows writing scores, use them to choose how hard the next text or task should be, and say once, plainly, when the scores have gone up.',
     COACH_BLOCK_GUIDE,
     `Reply in ${replyLanguage()}. Keep the English sentences and words you teach in English.`,
   ].join('\n');

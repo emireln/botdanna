@@ -3,9 +3,10 @@
 // the same message box. A chat is named from its first question.
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ClipboardEvent, type DragEvent, type KeyboardEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowUp, AtSign, BookOpen, Download, FileText, History, Paperclip, Plus, Sparkles, Square, Volume2, VolumeX, X } from 'lucide-react';
+import { ArrowUp, AtSign, BookOpen, Download, FileText, History, Paperclip, Plus, Search, Sparkles, Square, Volume2, VolumeX, X } from 'lucide-react';
 import { AssistantReply, LearnerTurn, WritingReply } from '../components/CoachReply';
 import { CoachHome } from '../components/CoachHome';
+import { ChatFind } from '../components/ChatFind';
 import { ChatHistory } from '../components/ChatHistory';
 import { MentionSheet } from '../components/MentionSheet';
 import { useVoiceInput, VoiceButton } from '../components/VoiceInput';
@@ -19,6 +20,8 @@ import { coachMode, type CoachModeId } from '../lib/coachModes';
 import { fluencyOf, isRoleplayMode, ROLEPLAY_XP, scenarioOf } from '../lib/scenarios';
 import { parseCoachReply, spokenText, type VocabItem } from '../lib/coachReply';
 import { vocabReview } from '../lib/coachVocab';
+import { savedWords } from '../lib/savedWords';
+import { daysSinceWriting as daysSinceLastCheck, writingRuns } from '../lib/writingHistory';
 import { draftKey } from '../lib/drafts';
 import { indexFor, retrieve, type LibraryDocument } from '../lib/retrieval';
 import { activeExamDate } from '../lib/exam';
@@ -27,7 +30,7 @@ import { useT } from '../lib/i18n/react';
 import { narrate, type Narration } from '../lib/speech';
 import { playSound } from '../lib/sound';
 import { createTextStore } from '../lib/textStore';
-import type { ChatImage, ChatMessage, LibraryFileRow, ReviewRow, TutorChatRow, TutorRow } from '../lib/types';
+import type { AttemptRow, ChatImage, ChatMessage, LibraryFileRow, ReviewRow, TutorChatRow, TutorRow } from '../lib/types';
 import { useAI, type ReplyStream } from '../state/ai';
 import { useAppData } from '../state/appData';
 import { useAuth } from '../state/auth';
@@ -122,6 +125,9 @@ export function CoachScreen() {
   const [cutReplies, setCutReplies] = useState<ReadonlySet<string>>(() => new Set());
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [reviewKeys, setReviewKeys] = useState<ReadonlySet<string>>(() => new Set());
+  // The practice runs: the writing checks among them are what the coach is told about, and what the home shows.
+  const [attempts, setAttempts] = useState<AttemptRow[]>([]);
+  const [findOpen, setFindOpen] = useState(false);
   const [autoRead, setAutoRead] = useState(readAutoRead);
   const [showJump, setShowJump] = useState(false);
   // A few questions for the home, picked again for each visit.
@@ -238,6 +244,25 @@ export function CoachScreen() {
     };
   }, [backend]);
 
+  useEffect(() => {
+    if (!backend) return undefined;
+    let cancelled = false;
+    backend
+      .listAttempts(30, 'practice')
+      .then((rows) => {
+        if (!cancelled) setAttempts(rows);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [backend]);
+
+  // The find box belongs to one chat: moving to another chat closes it.
+  useEffect(() => {
+    setFindOpen(false);
+  }, [activeId]);
+
   // A search result that asks for a chat, while the coach is already open. The request is used once.
   useEffect(() => {
     const requested = (location.state as { chatId?: string } | null)?.chatId;
@@ -328,6 +353,11 @@ export function CoachScreen() {
     return { docs: fresh, images };
   };
 
+  // The saved words and the writing checks, read from the learner's own record.
+  const savedWordList = useMemo(() => savedWords(reviews), [reviews]);
+  const writingHistory = useMemo(() => writingRuns(attempts), [attempts]);
+  const lastCheckDays = useMemo(() => daysSinceLastCheck(writingHistory, localDate()), [writingHistory]);
+
   // The learner's facts, the mode's instructions and the shared rules make the instructions of one reply.
   const instructionsFor = (modeId: CoachModeId, notes: string[]): string => {
     const facts = profile
@@ -342,6 +372,8 @@ export function CoachScreen() {
           skills,
           mistakes: reviews,
           today: localDate(),
+          writingScores: writingHistory.map((run) => run.score),
+          savedWords: savedWordList.map((item) => item.word),
         })
       : '';
     return [profile ? coachSystem(profile) : '', facts, coachMode(modeId).instructions, ...notes].filter(Boolean).join('\n\n');
@@ -839,6 +871,16 @@ export function CoachScreen() {
           <button
             type="button"
             className="btn btn--ghost btn--icon"
+            onClick={() => setFindOpen(true)}
+            disabled={!messages || messages.length === 0}
+            aria-label={t('Find in this chat')}
+            title={t('Find in this chat')}
+          >
+            <Search aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className="btn btn--ghost btn--icon"
             onClick={exportChat}
             disabled={!messages || messages.length === 0}
             aria-label={t('Save this chat as a file')}
@@ -854,6 +896,8 @@ export function CoachScreen() {
           </button>
         </div>
       </header>
+
+      {findOpen && messages && <ChatFind messages={messages} onClose={() => setFindOpen(false)} />}
 
       {!ready &&
         (desktop ? (
@@ -880,6 +924,8 @@ export function CoachScreen() {
               examName={profile?.exam_name ?? null}
               skills={skills}
               reviewCount={reviews.length}
+              savedWords={savedWordList}
+              daysSinceWriting={lastCheckDays}
               recentChats={recentChats}
               starters={starters}
               busy={busy || !ready}
@@ -898,36 +944,37 @@ export function CoachScreen() {
                 </section>
               )}
               {messages.map((message) =>
-                message.role === 'user' ? (
-                  <LearnerTurn
-                    key={message.id}
-                    text={message.content}
-                    editable={message.id === lastQuestionId}
-                    busy={busy}
-                    onCopy={copyStable}
-                    onEdit={editStable}
-                    attachments={message.attachments}
-                  />
-                ) : (
-                  message.content && (
-                    <AssistantReply
-                      key={message.id}
-                      id={message.id}
-                      text={message.content}
-                      latest={message.id === latestReplyId && !visibleLive}
-                      busy={busy}
-                      cut={cutReplies.has(message.id)}
-                      draftPrefix={profile ? draftKey(profile.id, `coach-exercise:${message.id}`) : null}
-                      reviewKeys={reviewKeys}
-                      onSend={sendAsText}
-                      onSaveWord={saveWordStable}
-                      onNavigate={navigate}
-                      onRegenerate={regenerateStable}
-                      onContinue={continueStable}
-                      onCopy={copyStable}
-                    />
-                  )
-                ),
+                message.role === 'user' || message.content ? (
+                  // Each message sits in a frame that carries its id, so the find box can bring it into view.
+                  <div key={message.id} className="coach__turn" data-message-id={message.id}>
+                    {message.role === 'user' ? (
+                      <LearnerTurn
+                        text={message.content}
+                        editable={message.id === lastQuestionId}
+                        busy={busy}
+                        onCopy={copyStable}
+                        onEdit={editStable}
+                        attachments={message.attachments}
+                      />
+                    ) : (
+                      <AssistantReply
+                        id={message.id}
+                        text={message.content}
+                        latest={message.id === latestReplyId && !visibleLive}
+                        busy={busy}
+                        cut={cutReplies.has(message.id)}
+                        draftPrefix={profile ? draftKey(profile.id, `coach-exercise:${message.id}`) : null}
+                        reviewKeys={reviewKeys}
+                        onSend={sendAsText}
+                        onSaveWord={saveWordStable}
+                        onNavigate={navigate}
+                        onRegenerate={regenerateStable}
+                        onContinue={continueStable}
+                        onCopy={copyStable}
+                      />
+                    )}
+                  </div>
+                ) : null,
               )}
               {visibleLive && <WritingReply store={liveText} reviewKeys={reviewKeys} onNavigate={navigate} onCopy={copyStable} onFollow={followStream} />}
               {sending && !visibleLive && (
