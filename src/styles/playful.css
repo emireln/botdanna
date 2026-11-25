@@ -1519,6 +1519,35 @@
     border-left: 8px solid var(--deck, var(--primary));
   }
 
+  /* The tabs in the title bar, Playful: each tab is a white key cap, and the open one is the solid primary colour. */
+  :root[data-look='playful'] .titletabs {
+    gap: 6px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  :root[data-look='playful'] .titletabs__item {
+    height: 32px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--radius);
+    background: #ffffff;
+    color: var(--ink);
+    font-weight: 800;
+    box-shadow: 0 3px 0 var(--line-2);
+  }
+
+  :root[data-look='playful'] .titletabs__item:hover:not(.is-active) {
+    background: var(--surface-2);
+  }
+
+  :root[data-look='playful'] .titletabs__item.is-active {
+    background: var(--primary-600);
+    color: #ffffff;
+    box-shadow: 0 3px 0 var(--primary-700);
+  }
+
   /* Reduced motion: the presses and lifts still show, but nothing moves for long. */
   @media (prefers-reduced-motion: reduce) {
     :root[data-look='playful'] .btn,

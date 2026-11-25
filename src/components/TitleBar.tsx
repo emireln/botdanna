@@ -9,6 +9,8 @@ import { bridge, type WindowState } from '../lib/bridge';
 import { useT } from '../lib/i18n/react';
 import { useAuth } from '../state/auth';
 import { useAppData } from '../state/appData';
+import { useTabLayout } from '../state/tabLayout';
+import { TitleTabs } from './NavTabs';
 
 function useWindowControls() {
   const [maximized, setMaximized] = useState(false);
@@ -59,6 +61,9 @@ export function TitleBar() {
   }, [menuOpen]);
 
   const showActions = status === 'in' && location.pathname !== '/setup';
+  // The tabs sit in the title bar only on the pages that have them: the same pages as the bottom bar.
+  const { layout: tabLayout } = useTabLayout();
+  const showTabs = tabLayout === 'top' && showActions && location.pathname !== '/welcome' && location.pathname !== '/auth';
   const name = profile?.display_name || profile?.username || t('You');
   const go = (path: string) => {
     setMenuOpen(false);
@@ -70,6 +75,7 @@ export function TitleBar() {
       <Link to="/" className="wordmark" aria-label={t('botdanna home')}>
         botdanna
       </Link>
+      {showTabs && <TitleTabs />}
       <div className="titlebar__spacer" onDoubleClick={() => windows.desktop && windows.toggle()} />
 
       {showActions && (

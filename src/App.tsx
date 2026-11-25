@@ -11,6 +11,7 @@ import { AIProvider } from './state/ai';
 import { AppDataProvider, useAppData } from './state/appData';
 import { LookSync } from './state/look';
 import { ToastProvider } from './state/toast';
+import { TabLayoutProvider, useTabLayout } from './state/tabLayout';
 import { UpdateNotice } from './components/UpdateNotice';
 import { LanguageProvider, useT } from './lib/i18n/react';
 import { Splash } from './screens/Splash';
@@ -111,8 +112,10 @@ function AppRoutes() {
 }
 
 function Frame() {
+  // The frame tells the styles where the tabs sit (data-tabs), so the bottom space is kept only for the bottom bar.
+  const { layout } = useTabLayout();
   return (
-    <div className="frame">
+    <div className="frame" data-tabs={layout}>
       <TitleBar />
       <div className="frame__body">
         <NavigationBridge />
@@ -131,7 +134,9 @@ export default function App() {
           <AIProvider>
             <AppDataProvider>
               <LookSync />
-              <Frame />
+              <TabLayoutProvider>
+                <Frame />
+              </TabLayoutProvider>
             </AppDataProvider>
           </AIProvider>
         </AuthProvider>

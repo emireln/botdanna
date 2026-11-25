@@ -52,3 +52,27 @@ export function readSoundPrefs(): SoundPrefs {
 export function writeSoundPrefs(prefs: SoundPrefs): void {
   writeJson(SOUND_KEY, prefs);
 }
+
+// Where the tabs sit: under the screen, as they always have, or in the title bar, next to the wordmark. A choice of this
+// device, kept under its own key in this app's local storage. It is never sent to the account.
+export const TAB_LAYOUTS = ['bottom', 'top'] as const;
+export type TabLayout = (typeof TAB_LAYOUTS)[number];
+
+const TAB_LAYOUT_KEY = 'botdanna.tabs';
+
+/** The tab layout of this device. Anything other than "top", and no storage at all, keeps the tabs at the bottom. */
+export function readTabLayout(): TabLayout {
+  try {
+    return window.localStorage.getItem(TAB_LAYOUT_KEY) === 'top' ? 'top' : 'bottom';
+  } catch {
+    return 'bottom';
+  }
+}
+
+export function writeTabLayout(layout: TabLayout): void {
+  try {
+    window.localStorage.setItem(TAB_LAYOUT_KEY, layout);
+  } catch {
+    // Storage can be blocked. The choice then lasts until the app closes.
+  }
+}

@@ -290,6 +290,67 @@
     color: #ffffff;
   }
 
+  /* ---------- The tabs in the title bar: one white capsule next to the wordmark, with the open tab tinted. With the tabs
+     there, the window has no bottom bar, so the space for it goes. ---------- */
+  .frame[data-tabs='top'] {
+    --nav-h: 0px;
+  }
+
+  .titletabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    height: 34px;
+    padding: 3px;
+    border-radius: var(--radius-pill);
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(15, 27, 51, 0.14);
+  }
+
+  .titletabs__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: var(--radius-pill);
+    color: var(--ink-2);
+    font-size: 13.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition:
+      background-color 0.15s var(--ease),
+      color 0.15s var(--ease);
+  }
+
+  .titletabs__item svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+  }
+
+  .titletabs__item:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  .titletabs__item.is-active {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    font-weight: 650;
+  }
+
+  /* In a narrow window the names go, and the icons keep the tabs usable. Each icon still has its name for a screen reader. */
+  @media (max-width: 640px) {
+    .titletabs__label {
+      display: none;
+    }
+
+    .titletabs__item {
+      padding: 0 9px;
+    }
+  }
+
   /* ---------- Wordmark ---------- */
   .wordmark {
     display: inline-flex;

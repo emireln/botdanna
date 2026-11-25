@@ -1750,4 +1750,11 @@ export const APP_PT: Record<string, string> = {
   '{current} of {count}': '{current} de {count}',
   'Your writing scores': 'Suas notas de escrita',
   'Scores out of 100, oldest first.': 'Notas de 0 a 100, da mais antiga para a mais recente.',
+  // Where the tabs sit: under the screen, or in the title bar (a choice of this device)
+  'Tabs': 'Abas',
+  'At the bottom': 'Embaixo',
+  'In the title bar': 'Na barra do título',
+  'The tabs sit under the screen, as on a phone.': 'As abas ficam embaixo da tela, como em um celular.',
+  'The tabs sit in the title bar, next to the wordmark.': 'As abas ficam na barra do título, ao lado do nome do app.',
+  'Saved on this device only. It is not kept in your account.': 'Salvo somente neste dispositivo. Não fica guardado na sua conta.',
 };

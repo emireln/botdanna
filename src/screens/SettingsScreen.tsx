@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Cloud, Laptop, Play, Star, Trash2, Volume2 } from 'lucide-react';
+import { Cloud, Laptop, PanelBottom, PanelTop, Play, Star, Trash2, Volume2 } from 'lucide-react';
 import { LanguageSwitch } from '../components/LanguageSwitch';
 import { KeyConnect, PROVIDER_LABEL } from '../components/KeyConnect';
 import { LookPicker } from '../components/LookPicker';
@@ -20,6 +20,7 @@ import { useUpdateStatus } from '../lib/update';
 import { useAI } from '../state/ai';
 import { useAuth } from '../state/auth';
 import { useAppData } from '../state/appData';
+import { useTabLayout } from '../state/tabLayout';
 import { useToast } from '../state/toast';
 import type { AIModel, LookId, Provider } from '../lib/types';
 
@@ -33,6 +34,8 @@ export function SettingsScreen() {
   const [savingLook, setSavingLook] = useState(false);
   // The device's own choices for sounds. Each change is saved on this device as it is made.
   const [sounds, setSounds] = useState<SoundPrefs>(() => readSoundPrefs());
+  // Where the tabs sit on this device. Only this device: the choice is never sent to the account.
+  const { layout: tabLayout, setLayout: setTabLayout } = useTabLayout();
   const changeSounds = (next: SoundPrefs) => {
     writeSoundPrefs(next);
     setSounds(next);
@@ -326,6 +329,27 @@ export function SettingsScreen() {
       <SectionTitle title={t('Look')} />
       <p className="muted">{t('Your look is saved to your account. Without an account it is kept on this device.')}</p>
       <LookPicker value={look} disabled={savingLook} onChange={(next) => void chooseLook(next)} />
+
+      <SectionTitle title={t('Tabs')} />
+      <div className="mode-grid" role="radiogroup" aria-label={t('Tabs')}>
+        <button type="button" role="radio" aria-checked={tabLayout === 'bottom'} className="mode-card" onClick={() => setTabLayout('bottom')}>
+          <span className="mode-card__icon">
+            <PanelBottom aria-hidden="true" />
+          </span>
+          <span className="mode-card__title">{t('At the bottom')}</span>
+          <span className="mode-card__text">{t('The tabs sit under the screen, as on a phone.')}</span>
+          <span className="mode-card__tick">{tabLayout === 'bottom' && <span aria-hidden="true">✓</span>}</span>
+        </button>
+        <button type="button" role="radio" aria-checked={tabLayout === 'top'} className="mode-card" onClick={() => setTabLayout('top')}>
+          <span className="mode-card__icon">
+            <PanelTop aria-hidden="true" />
+          </span>
+          <span className="mode-card__title">{t('In the title bar')}</span>
+          <span className="mode-card__text">{t('The tabs sit in the title bar, next to the wordmark.')}</span>
+          <span className="mode-card__tick">{tabLayout === 'top' && <span aria-hidden="true">✓</span>}</span>
+        </button>
+      </div>
+      <p className="muted small">{t('Saved on this device only. It is not kept in your account.')}</p>
 
       <SectionTitle title={t('How you use botdanna')} />
       <div className="mode-grid" role="radiogroup" aria-label={t('How you use botdanna')}>
