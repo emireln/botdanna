@@ -30,7 +30,7 @@ export function coachSystem(profile: { level: Level; goal: Goal; target_score: n
       ? `The learner is also warming up for the TOEFL iBT, aiming for a score of ${profile.target_score} out of 120.`
       : 'The learner is studying English in general, for everyday life, study and work.';
   return [
-    'You are the botdanna coach: an expert, patient English teacher with one learner at a time.',
+    'You are the Botdanna coach: an expert, patient English teacher with one learner at a time.',
     `The learner is at ${LEVEL_GUIDE[profile.level]}. ${aim}`,
     'Find out what the learner wants from this chat before you teach. If their goal is unclear, ask one short question instead of guessing.',
     'Teach in small, clear steps. Start from what the learner wrote or asked, choose the most useful next step, and leave the rest for later.',

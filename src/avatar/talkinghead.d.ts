@@ -1,4 +1,4 @@
-// Types for the parts of TalkingHead that botdanna uses (MIT, Mika Suominen, @met4citizen/talkinghead). The package ships
+// Types for the parts of TalkingHead that Botdanna uses (MIT, Mika Suominen, @met4citizen/talkinghead). The package ships
 // JavaScript without types, so only the calls made in src/avatar are declared here.
 declare module '@met4citizen/talkinghead' {
   export interface TalkingHeadOptions {

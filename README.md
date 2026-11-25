@@ -1,6 +1,6 @@
-# botdanna
+# Botdanna
 
-**Your AI English coach.** botdanna is a Windows app for learning English with a coach that answers any question, practises real situations with you, and checks your writing. It works with your own AI key, and it uses the same accounts and cloud data as [danna](https://github.com/emireln/danna), so you can sign in with the same account in both apps.
+**Your AI English coach.** Botdanna is a Windows app for learning English with a coach that answers any question, practises real situations with you, and checks your writing. It works with your own AI key, and it uses the same accounts and cloud data as [Danna](https://github.com/emireln/danna), so you can sign in with the same account in both apps.
 
 ## What you can do
 
@@ -13,14 +13,14 @@
 
 ## Your AI key
 
-botdanna works with your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. The key is encrypted on your computer with the protection Windows provides, and your messages go straight from the app to the provider you chose.
+Botdanna works with your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. The key is encrypted on your computer with the protection Windows provides, and your messages go straight from the app to the provider you chose.
 
 - The coach, the writing check, the word help and the practice all use the chat model of the provider you choose.
 - Speech-to-text (speaking practice and the coach's microphone) needs an OpenAI or Gemini key.
 
 ## Accounts and data
 
-- **With an online account**, your chats, files, profile and AI keys (sealed with your password) are kept in that account, the same one danna uses.
+- **With an online account**, your chats, files, profile and AI keys (sealed with your password) are kept in that account, the same one Danna uses.
 - **On this device**, everything stays on your computer, and nothing is sent anywhere except to the AI provider when you ask the coach something.
 
 ## Install
@@ -42,4 +42,4 @@ npm run typecheck
 npm run dist      # the Windows installer in release/
 ```
 
-`AGENTS.md` describes the layout, the rules the tests enforce, and how the database is shared with danna. `docs/botdanna.md` explains what was kept from danna and what was left out.
+`AGENTS.md` describes the layout, the rules the tests enforce, and how the database is shared with Danna. `docs/botdanna.md` explains what was kept from Danna and what was left out.

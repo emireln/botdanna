@@ -21,7 +21,7 @@ import { initLang } from './lib/i18n';
 
 initLang();
 const root = document.getElementById('root');
-if (!root) throw new Error('botdanna could not start: the page is missing its root element.');
+if (!root) throw new Error('Botdanna could not start: the page is missing its root element.');
 
 createRoot(root).render(
   <StrictMode>

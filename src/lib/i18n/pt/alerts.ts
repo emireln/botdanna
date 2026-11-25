@@ -2,7 +2,7 @@
 export const ALERTS_PT: Record<string, string> = {
   // Settings: sounds
   'Sounds': 'Sons',
-  'Sounds in botdanna': 'Sons do botdanna',
+  'Sounds in Botdanna': 'Sons do Botdanna',
   'Play {sound}': 'Ouvir {sound}',
   'Listen': 'Ouvir',
   'Correct answer': 'Resposta certa',

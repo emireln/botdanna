@@ -64,7 +64,7 @@ const url = gh([
   '--target',
   head,
   '--title',
-  `botdanna ${version}`,
+  `Botdanna ${version}`,
   '--notes',
   `${notes}\n\nWindows installer: botdanna-setup-${version}-x64.exe`,
 ]);

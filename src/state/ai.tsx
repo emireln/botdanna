@@ -50,7 +50,7 @@ interface AIApi {
 
 const AIContext = createContext<AIApi | null>(null);
 
-const DESKTOP_ONLY = 'AI features run in the botdanna desktop app, where your key is stored securely on this device.';
+const DESKTOP_ONLY = 'AI features run in the Botdanna desktop app, where your key is stored securely on this device.';
 
 export function AIProvider({ children }: { children: ReactNode }) {
   const { notify } = useToast();

@@ -11,7 +11,7 @@ export interface Microphone {
 function microphoneError(error: unknown): Error {
   const name = error instanceof DOMException ? error.name : '';
   if (name === 'NotAllowedError' || name === 'SecurityError') {
-    return userError('botdanna needs the microphone. Allow it for botdanna in the Windows settings, then try again.');
+    return userError('Botdanna needs the microphone. Allow it for Botdanna in the Windows settings, then try again.');
   }
   if (name === 'NotFoundError' || name === 'OverconstrainedError') {
     return userError('No microphone was found. Connect one, then try again.');

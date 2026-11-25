@@ -95,7 +95,7 @@ export function SetupScreen() {
   const next = () => {
     setError(null);
     if (step === 1) {
-      if (!shownName.trim()) return setError(t('Add the name you want botdanna to use.'));
+      if (!shownName.trim()) return setError(t('Add the name you want Botdanna to use.'));
       if (mode === 'supabase' && !/^[a-z0-9_]{3,20}$/.test(shownUsername)) {
         return setError(t('Usernames use 3 to 20 lowercase letters, numbers or underscores.'));
       }
@@ -180,11 +180,11 @@ export function SetupScreen() {
                 <>
                   <StepHead
                     eyebrow={t('Learning setup')}
-                    title={t('What should botdanna call you?')}
+                    title={t('What should Botdanna call you?')}
                     text={
                       mode === 'supabase'
                         ? t('Your username is how you are known in your account. You can change these later in your profile.')
-                        : t('This is how botdanna greets you. You can change it later in your profile.')
+                        : t('This is how Botdanna greets you. You can change it later in your profile.')
                     }
                   />
                   <Field label={t('Name')}>
@@ -268,7 +268,7 @@ export function SetupScreen() {
                   <StepHead
                     eyebrow={t('AI key')}
                     title={t('Connect your AI key')}
-                    text={t('botdanna is powered by your own key. Works with OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. You can skip this and add it later.')}
+                    text={t('Botdanna is powered by your own key. Works with OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. You can skip this and add it later.')}
                   />
                   <KeyConnect autoFocus />
                   <p className="muted">{t('Prefer to wait? Add a key later in Settings. It stays on this device.')}</p>

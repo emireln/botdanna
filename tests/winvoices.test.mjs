@@ -99,7 +99,7 @@ test('on Windows, the real voices of this PC are read, and one of them speaks', 
   const found = await windows.list();
   assert.equal(found.error, null);
   assert.ok(found.voices.length >= 1, 'at least one voice is installed');
-  const sound = await windows.synthesize('Hello from botdanna.', found.voices[0].id);
+  const sound = await windows.synthesize('Hello from Botdanna.', found.voices[0].id);
   assert.equal(sound.toString('ascii', 0, 4), 'RIFF');
   assert.ok(sound.length > 1000, 'the voice made a sentence of sound');
 });

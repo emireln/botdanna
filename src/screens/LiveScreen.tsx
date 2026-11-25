@@ -83,7 +83,7 @@ export function LiveScreen() {
 
   useEffect(() => () => conversation.stop(), [conversation]);
 
-  // A talk ends when botdanna is hidden, so the microphone never listens out of sight.
+  // A talk ends when Botdanna is hidden, so the microphone never listens out of sight.
   useEffect(() => {
     const hide = () => {
       if (document.visibilityState === 'hidden') conversation.stop();
@@ -248,7 +248,7 @@ export function LiveScreen() {
       </PageHeader>
 
       {!bridge && (
-        <Notice tone="info">{t('Talk live works in the botdanna desktop app. Here you can see the coach, but not talk to it.')}</Notice>
+        <Notice tone="info">{t('Talk live works in the Botdanna desktop app. Here you can see the coach, but not talk to it.')}</Notice>
       )}
       {bridge && ai.loaded && !engine && (
         <Notice tone="info">

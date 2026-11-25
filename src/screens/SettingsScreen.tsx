@@ -164,12 +164,12 @@ export function SettingsScreen() {
     setChecking(true);
     try {
       const result = await bridge.update.check();
-      if (result.state === 'unavailable') notify(t('Updates are checked in the installed botdanna app.'));
+      if (result.state === 'unavailable') notify(t('Updates are checked in the installed Botdanna app.'));
       else if (result.state === 'failed') notify(t('Could not check for updates. Try again later.'), 'error');
-      else if (result.state === 'idle') notify(t('botdanna is up to date.'), 'ok');
-      else if (result.state === 'available') notify(t('botdanna {version} is available. Download it when you like.', { version: result.version ?? '' }), 'ok');
-      else if (result.state === 'ready') notify(t('botdanna {version} is ready. It installs when you close botdanna.', { version: result.version ?? '' }), 'ok');
-      else notify(t('Downloading botdanna {version} in the background.', { version: result.version ?? '' }), 'ok');
+      else if (result.state === 'idle') notify(t('Botdanna is up to date.'), 'ok');
+      else if (result.state === 'available') notify(t('Botdanna {version} is available. Download it when you like.', { version: result.version ?? '' }), 'ok');
+      else if (result.state === 'ready') notify(t('Botdanna {version} is ready. It installs when you close Botdanna.', { version: result.version ?? '' }), 'ok');
+      else notify(t('Downloading Botdanna {version} in the background.', { version: result.version ?? '' }), 'ok');
     } catch (error) {
       notify(t(errorText(error)), 'error');
     } finally {
@@ -300,7 +300,7 @@ export function SettingsScreen() {
       await moveToDevice(keepCopy);
       setSwitchOpen(false);
       await refresh();
-      notify(t('You are now using botdanna on this device.'), 'ok');
+      notify(t('You are now using Botdanna on this device.'), 'ok');
     } catch (caught) {
       notify(t(errorText(caught)), 'error');
     } finally {
@@ -351,8 +351,8 @@ export function SettingsScreen() {
       </div>
       <p className="muted small">{t('Saved on this device only. It is not kept in your account.')}</p>
 
-      <SectionTitle title={t('How you use botdanna')} />
-      <div className="mode-grid" role="radiogroup" aria-label={t('How you use botdanna')}>
+      <SectionTitle title={t('How you use Botdanna')} />
+      <div className="mode-grid" role="radiogroup" aria-label={t('How you use Botdanna')}>
         <button
           role="radio"
           aria-checked={mode === 'local'}
@@ -390,13 +390,13 @@ export function SettingsScreen() {
       <div className="stack">
         <div className="settings-row">
           <div className="settings-row__body">
-            <div className="settings-row__title">{t('Sounds in botdanna')}</div>
+            <div className="settings-row__title">{t('Sounds in Botdanna')}</div>
             <div className="settings-row__text">{t('Short, friendly sounds for your answers and the coach.')}</div>
           </div>
           <button
             role="switch"
             aria-checked={sounds.enabled}
-            aria-label={t('Sounds in botdanna')}
+            aria-label={t('Sounds in Botdanna')}
             className="switch"
             onClick={() => changeSounds({ ...sounds, enabled: !sounds.enabled })}
           >
@@ -590,13 +590,13 @@ export function SettingsScreen() {
           <SectionTitle title={t('Window')} />
           <div className="settings-row">
             <div className="settings-row__body">
-              <div className="settings-row__title">{t('Keep botdanna in the tray')}</div>
+              <div className="settings-row__title">{t('Keep Botdanna in the tray')}</div>
               <div className="settings-row__text">{t('Closing the window keeps practice running. Open it again from the tray icon.')}</div>
             </div>
             <button
               role="switch"
               aria-checked={settings.closeToTray}
-              aria-label={t('Keep botdanna in the tray when the window closes')}
+              aria-label={t('Keep Botdanna in the tray when the window closes')}
               className="switch"
               onClick={toggleTray}
             >
@@ -644,15 +644,15 @@ export function SettingsScreen() {
       <div className="stack">
         <div className="settings-row">
           <div className="settings-row__body">
-            <div className="settings-row__title">botdanna {version}</div>
+            <div className="settings-row__title">Botdanna {version}</div>
             {update.state === 'downloading' && update.version && (
-              <div className="settings-row__text">{t('Downloading botdanna {version} in the background.', { version: update.version })}</div>
+              <div className="settings-row__text">{t('Downloading Botdanna {version} in the background.', { version: update.version })}</div>
             )}
             {update.state === 'available' && update.version && (
-              <div className="settings-row__text">{t('botdanna {version} is available. Download it when you like.', { version: update.version })}</div>
+              <div className="settings-row__text">{t('Botdanna {version} is available. Download it when you like.', { version: update.version })}</div>
             )}
             {update.state === 'ready' && update.version && (
-              <div className="settings-row__text">{t('botdanna {version} is ready. It installs when you close botdanna.', { version: update.version })}</div>
+              <div className="settings-row__text">{t('Botdanna {version} is ready. It installs when you close Botdanna.', { version: update.version })}</div>
             )}
           </div>
           {update.state === 'available' && (
@@ -676,7 +676,7 @@ export function SettingsScreen() {
       <SectionTitle title={t('Feedback')} />
       {mode === 'supabase' ? (
         <div className="feedback-box">
-          <p className="settings-row__text">{t('Rate botdanna from 1 to 5 stars and leave a comment if you like. It goes to the developer.')}</p>
+          <p className="settings-row__text">{t('Rate Botdanna from 1 to 5 stars and leave a comment if you like. It goes to the developer.')}</p>
           <div className="rate-stars" role="group" aria-label={t('Rating')}>
             {[1, 2, 3, 4, 5].map((value) => {
               const on = value <= (hoverRating || rating);
@@ -701,7 +701,7 @@ export function SettingsScreen() {
             maxLength={1000}
             value={comment}
             onChange={(event) => setComment(event.target.value)}
-            placeholder={t('What would make botdanna better? (optional)')}
+            placeholder={t('What would make Botdanna better? (optional)')}
             aria-label={t('Your comment')}
           />
           {feedbackError && <Notice tone="error">{t(feedbackError)}</Notice>}
@@ -763,7 +763,7 @@ export function SettingsScreen() {
 
       {switchOpen && (
         <Sheet
-          title={t('Use botdanna on this device?')}
+          title={t('Use Botdanna on this device?')}
           onClose={() => setSwitchOpen(false)}
           footer={
             <>

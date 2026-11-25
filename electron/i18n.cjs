@@ -1,20 +1,20 @@
 // The words the desktop shell shows outside the window: the tray menu and its notice.
 const TEXT = {
   en: {
-    open: 'Open botdanna',
+    open: 'Open Botdanna',
     coach: 'Chat with the coach',
     live: 'Talk live',
     write: 'Check my writing',
-    quit: 'Quit botdanna',
-    hint: 'botdanna is still running. Click the tray icon to open it again.',
+    quit: 'Quit Botdanna',
+    hint: 'Botdanna is still running. Click the tray icon to open it again.',
   },
   pt: {
-    open: 'Abrir o botdanna',
+    open: 'Abrir o Botdanna',
     coach: 'Conversar com o coach',
     live: 'Falar ao vivo',
     write: 'Revisar minha escrita',
-    quit: 'Sair do botdanna',
-    hint: 'O botdanna continua aberto. Clique no ícone da bandeja para abri-lo de novo.',
+    quit: 'Sair do Botdanna',
+    hint: 'O Botdanna continua aberto. Clique no ícone da bandeja para abri-lo de novo.',
   },
 };
 

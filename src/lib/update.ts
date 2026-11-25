@@ -1,5 +1,5 @@
 // The desktop app's update state: a newer version is downloading, or it is ready and installs when
-// botdanna closes. In the browser there are no updates, so the state stays idle.
+// Botdanna closes. In the browser there are no updates, so the state stays idle.
 import { useEffect, useState } from 'react';
 import { bridge, type UpdateStatus } from './bridge';
 

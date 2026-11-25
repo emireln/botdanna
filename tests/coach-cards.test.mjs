@@ -60,7 +60,7 @@ test('a vocabulary card keeps up to eight words, each with a meaning, and drops 
   assert.equal(kept.items[0].note, 'Stress: re-LI-a-ble');
 });
 
-test('an actions card keeps only the pages of the app, so the learner is sent only where botdanna goes', () => {
+test('an actions card keeps only the pages of the app, so the learner is sent only where Botdanna goes', () => {
   const [card] = reply.parseCoachReply(
     '```actions\n{"items":[{"label":"Talk","to":"/coach/live"},{"label":"Outside","to":"https://evil.example"},{"label":"Old page","to":"/study/listening"},{"label":"Settings","to":"/settings"},{"label":"Writing","to":"/write"},{"label":"Home","to":"/"}]}\n```',
   );

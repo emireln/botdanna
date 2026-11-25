@@ -1,4 +1,4 @@
-// Where sign-in returns the person: to a page inside botdanna, never to a sign-in page or to another site.
+// Where sign-in returns the person: to a page inside Botdanna, never to a sign-in page or to another site.
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
@@ -17,7 +17,7 @@ after(async () => {
   await server?.close();
 });
 
-test('sign-in returns to the page the person asked for, inside botdanna only', () => {
+test('sign-in returns to the page the person asked for, inside Botdanna only', () => {
   assert.equal(navigation.returnPath('/library'), '/library');
   assert.equal(navigation.returnPath('/coach/live?mode=talk'), '/coach/live?mode=talk');
   assert.equal(navigation.returnPath('/write#top'), '/write#top');

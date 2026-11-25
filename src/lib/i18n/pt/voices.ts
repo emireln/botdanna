@@ -11,7 +11,7 @@ export const VOICES_PT: Record<string, string> = {
   'UK English': 'Inglês britânico',
   'female': 'feminina',
   'male': 'masculina',
-  'Not in this copy of botdanna': 'Não está nesta cópia do botdanna',
+  'Not in this copy of Botdanna': 'Não está nesta cópia do Botdanna',
   'On this PC': 'Neste PC',
   'Looking for the voices on this PC…': 'Procurando as vozes deste PC…',
   'Look again': 'Procurar de novo',

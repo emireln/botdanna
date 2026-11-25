@@ -15,7 +15,7 @@ export const APP_PT: Record<string, string> = {
   'Main': 'Principal',
   'AI': 'IA',
   'You': 'Você',
-  'botdanna home': 'Início do botdanna',
+  'Botdanna home': 'Início do Botdanna',
   'Friends, {count} waiting': 'Amigos, {count} aguardando',
   'Friends': 'Amigos',
   "What's new": 'Novidades',
@@ -232,9 +232,9 @@ export const APP_PT: Record<string, string> = {
   '{count} minute': '{count} minuto',
   '{count} minutes': '{count} minutos',
   'Remove it from Today for good': 'Tirar do Hoje para sempre',
-  'botdanna {version} is available. Download it in Settings.': 'O botdanna {version} está disponível. Baixe-o em Configurações.',
-  'botdanna {version} is ready. Restart to update when you are ready.': 'O botdanna {version} está pronto. Reinicie para atualizar quando quiser.',
-  'botdanna {version} is available. Download it when you like.': 'O botdanna {version} está disponível. Baixe quando quiser.',
+  'Botdanna {version} is available. Download it in Settings.': 'O Botdanna {version} está disponível. Baixe-o em Configurações.',
+  'Botdanna {version} is ready. Restart to update when you are ready.': 'O Botdanna {version} está pronto. Reinicie para atualizar quando quiser.',
+  'Botdanna {version} is available. Download it when you like.': 'O Botdanna {version} está disponível. Baixe quando quiser.',
   'Download update': 'Baixar atualização',
   'Your report': 'Seu relatório',
   'My report': 'Meu relatório',
@@ -261,17 +261,17 @@ export const APP_PT: Record<string, string> = {
   'Your report was saved as an image.': 'Seu relatório foi salvo como imagem.',
   'Choose a rating from 1 to 5 stars.': 'Escolha de 1 a 5 estrelas.',
   'Keep the comment to 1000 characters or fewer.': 'Use no máximo 1000 caracteres no comentário.',
-  'What would make botdanna better? (optional)': 'O que tornaria o botdanna melhor? (opcional)',
-  'If botdanna helps you learn, you can support its work with a coffee. It opens in your browser.':
-    'Se o botdanna ajuda você a aprender, pode apoiar o trabalho com um café. Abre no seu navegador.',
-  'Rate botdanna from 1 to 5 stars and leave a comment if you like. It goes to the developer.':
-    'Avalie o botdanna de 1 a 5 estrelas e deixe um comentário, se quiser. A opinião vai para o desenvolvedor.',
+  'What would make Botdanna better? (optional)': 'O que tornaria o Botdanna melhor? (opcional)',
+  'If Botdanna helps you learn, you can support its work with a coffee. It opens in your browser.':
+    'Se o Botdanna ajuda você a aprender, pode apoiar o trabalho com um café. Abre no seu navegador.',
+  'Rate Botdanna from 1 to 5 stars and leave a comment if you like. It goes to the developer.':
+    'Avalie o Botdanna de 1 a 5 estrelas e deixe um comentário, se quiser. A opinião vai para o desenvolvedor.',
   'Feedback is sent with an online account. On this device, nothing leaves your computer.':
     'A opinião é enviada com uma conta online. Neste dispositivo, nada sai do seu computador.',
   'Minimize': 'Minimizar',
   'Restore': 'Restaurar',
   'Maximize': 'Maximizar',
-  'Loading botdanna': 'Carregando o botdanna',
+  'Loading Botdanna': 'Carregando o Botdanna',
 
   // Sign in and account
   'Enter a valid email address.': 'Digite um e-mail válido.',
@@ -285,6 +285,10 @@ export const APP_PT: Record<string, string> = {
   'Online accounts are not available right now. You can keep learning on this device.':
     'As contas online não estão disponíveis agora. Você pode continuar estudando neste dispositivo.',
   'Continue on this device': 'Continuar neste dispositivo',
+  'Continue with Google': 'Continuar com o Google',
+  'New here?': 'Novo aqui?',
+  'Already have an account?': 'Já tem uma conta?',
+  'Google sign-in did not finish. Try again.': 'O login com o Google não foi concluído. Tente de novo.',
   'Account': 'Conta',
   'Sign in': 'Entrar',
   'Create account': 'Criar conta',
@@ -317,8 +321,8 @@ export const APP_PT: Record<string, string> = {
   'Grammar, words, reading, listening, speaking and writing': 'Gramática, palavras, leitura, compreensão auditiva, fala e escrita',
   'A TOEFL warm-up when you need it': 'Um aquecimento para o TOEFL, quando você precisar',
   'Your progress': 'Seu progresso',
-  'How would you like to use botdanna?': 'Como você quer usar o botdanna?',
-  'How you use botdanna': 'Como você usa o botdanna',
+  'How would you like to use Botdanna?': 'Como você quer usar o Botdanna?',
+  'How you use Botdanna': 'Como você usa o Botdanna',
   'On this device': 'Neste dispositivo',
   'No account needed. Everything stays here.': 'Não precisa de conta. Tudo fica aqui.',
   'Sync across your devices and connect with friends.': 'Sincronize em todos os seus dispositivos e conecte-se com amigos.',
@@ -330,10 +334,10 @@ export const APP_PT: Record<string, string> = {
   'Your profile could not be loaded.': 'Não foi possível carregar o seu perfil.',
   'Step {step} of {total}': 'Etapa {step} de {total}',
   'Learning setup': 'Preferências de estudo',
-  'What should botdanna call you?': 'Como o botdanna deve chamar você?',
+  'What should Botdanna call you?': 'Como o Botdanna deve chamar você?',
   'Your username is how friends find you. You can change these later in your profile.':
     'Seu nome de usuário é como os amigos encontram você. Você pode mudar isso depois no seu perfil.',
-  'This is how botdanna greets you. You can change it later in your profile.': 'É assim que o botdanna cumprimenta você. Você pode mudar isso depois no seu perfil.',
+  'This is how Botdanna greets you. You can change it later in your profile.': 'É assim que o Botdanna cumprimenta você. Você pode mudar isso depois no seu perfil.',
   'Name': 'Nome',
   '3 to 20 characters: lowercase letters, numbers and underscores.': 'De 3 a 20 caracteres: letras minúsculas, números e sublinhados.',
   'Your goal': 'Seu objetivo',
@@ -379,7 +383,7 @@ export const APP_PT: Record<string, string> = {
     'Funciona com OpenAI, Anthropic, Google Gemini, OpenRouter ou DeepSeek. Você pode pular esta etapa, e tudo continua funcionando.',
   'Prefer to wait? Add a key later in Settings. It stays on this device.': 'Prefere esperar? Adicione uma chave depois, em Configurações. Ela fica neste dispositivo.',
   'Start my plan': 'Começar meu plano',
-  'Add the name you want botdanna to use.': 'Digite o nome que você quer que o botdanna use.',
+  'Add the name you want Botdanna to use.': 'Digite o nome que você quer que o Botdanna use.',
   'Usernames use 3 to 20 lowercase letters, numbers or underscores.': 'Nomes de usuário usam de 3 a 20 letras minúsculas, números ou sublinhados.',
   'Your plan is ready.': 'Seu plano está pronto.',
 
@@ -473,8 +477,8 @@ export const APP_PT: Record<string, string> = {
   'Clear': 'Limpar',
   'Add your AI key to start chatting with your coach.': 'Adicione sua chave de IA para começar a conversar com o seu coach.',
   'Open settings': 'Abrir configurações',
-  'The coach runs in the botdanna desktop app, where your AI key is kept on this device.':
-    'O coach funciona no app de desktop do botdanna, onde a sua chave de IA fica salva neste dispositivo.',
+  'The coach runs in the Botdanna desktop app, where your AI key is kept on this device.':
+    'O coach funciona no app de desktop do Botdanna, onde a sua chave de IA fica salva neste dispositivo.',
   'Ask anything about English. Try one of these to start.': 'Pergunte qualquer coisa sobre inglês. Experimente uma destas sugestões para começar.',
   'Explain my weakest skill and what to do this week': 'Explique minha habilidade mais fraca e o que fazer nesta semana',
   'Quiz me on present perfect vs past simple': 'Me faça um quiz sobre present perfect x past simple',
@@ -597,8 +601,8 @@ export const APP_PT: Record<string, string> = {
     'Escreva uma tese que você possa contestar. Dê a cada parágrafo de desenvolvimento um motivo e um exemplo.',
   'Rebuild the sentences you missed from memory the next day. Repeat the ones that still feel slow.':
     'No dia seguinte, reconstrua de memória as frases que você errou. Repita as que ainda parecem difíceis.',
-  'botdanna · TOEFL estimate': 'botdanna · estimativa TOEFL',
-  'botdanna · level report': 'botdanna · relatório de nível',
+  'Botdanna · TOEFL estimate': 'Botdanna · estimativa TOEFL',
+  'Botdanna · level report': 'Botdanna · relatório de nível',
   'of 120 (estimate)': 'de 120 (estimativa)',
 
   // Friends
@@ -607,8 +611,8 @@ export const APP_PT: Record<string, string> = {
   'Study together': 'Estudem juntos',
   'Friends need an online account': 'Amigos precisam de uma conta online',
   'Create an account': 'Criar uma conta',
-  'Friends, shared results and shared sets work with an online account. You are using botdanna offline on this device.':
-    'Amigos, resultados e conjuntos compartilhados funcionam com uma conta online. Você está usando o botdanna sem conta, neste dispositivo.',
+  'Friends, shared results and shared sets work with an online account. You are using Botdanna offline on this device.':
+    'Amigos, resultados e conjuntos compartilhados funcionam com uma conta online. Você está usando o Botdanna sem conta, neste dispositivo.',
   'Share': 'Compartilhar',
   'Requests': 'Pedidos',
   'Inbox': 'Caixa de entrada',
@@ -742,7 +746,7 @@ export const APP_PT: Record<string, string> = {
   'AI assistant': 'Assistente de IA',
   'Bring your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. It unlocks generated sets and coach feedback. The key stays on this device.':
     'Use a sua própria chave da OpenAI, Anthropic, Google Gemini, OpenRouter ou DeepSeek. Ela libera os conjuntos gerados e o feedback do coach. A chave fica neste dispositivo.',
-  'Keys can be added in the botdanna desktop app.': 'As chaves podem ser adicionadas no app de desktop do botdanna.',
+  'Keys can be added in the Botdanna desktop app.': 'As chaves podem ser adicionadas no app de desktop do Botdanna.',
   'Your key': 'Sua chave',
   'Paste your key here': 'Cole sua chave aqui',
   'Hide key': 'Ocultar chave',
@@ -763,10 +767,10 @@ export const APP_PT: Record<string, string> = {
   'Model updated.': 'Modelo atualizado.',
   '{provider} key removed.': 'Chave de {provider} removida.',
   'Window': 'Janela',
-  'Keep botdanna in the tray': 'Manter o botdanna na bandeja',
+  'Keep Botdanna in the tray': 'Manter o Botdanna na bandeja',
   'Closing the window keeps practice running. Open it again from the tray icon.':
     'Fechar a janela mantém o estudo em andamento. Abra-a de novo pelo ícone da bandeja.',
-  'Keep botdanna in the tray when the window closes': 'Manter o botdanna na bandeja ao fechar a janela',
+  'Keep Botdanna in the tray when the window closes': 'Manter o Botdanna na bandeja ao fechar a janela',
   'Progress saved on this device': 'Progresso salvo neste dispositivo',
   'Lessons, scores, sets, your picture and library can be added to your account.':
     'Lições, pontuações, conjuntos, sua foto e sua biblioteca podem ser adicionados à sua conta.',
@@ -780,14 +784,14 @@ export const APP_PT: Record<string, string> = {
   "Add this device's progress?": 'Adicionar o progresso deste dispositivo?',
   'Lessons, scores, practice sets, coach messages, library files and your picture are copied. What is already in your account stays as it is.':
     'Lições, pontuações, conjuntos de exercícios, mensagens do coach, arquivos da biblioteca e sua foto serão copiados. O que já está na sua conta continua como está.',
-  'Use botdanna on this device?': 'Usar o botdanna neste dispositivo?',
+  'Use Botdanna on this device?': 'Usar o Botdanna neste dispositivo?',
   'Copy my progress here': 'Copiar meu progresso para cá',
   'Your progress stays saved in your account. You can keep a copy on this device as well.':
     'Seu progresso continua salvo na sua conta. Você também pode manter uma cópia neste dispositivo.',
   'Your progress from this device is now in your account.': 'O progresso deste dispositivo agora está na sua conta.',
   '{count} item could not be copied. Try again later.': '{count} item não pôde ser copiado. Tente de novo mais tarde.',
   '{count} items could not be copied. Try again later.': '{count} itens não puderam ser copiados. Tente de novo mais tarde.',
-  'You are now using botdanna on this device.': 'Agora você está usando o botdanna neste dispositivo.',
+  'You are now using Botdanna on this device.': 'Agora você está usando o Botdanna neste dispositivo.',
 
   // Sessions
   'Sign in to start a session.': 'Entre na conta para começar uma sessão.',
@@ -869,8 +873,8 @@ export const APP_PT: Record<string, string> = {
   'Add a file in the Files tab first.': 'Adicione um arquivo na aba Arquivos primeiro.',
   'These files have no readable text yet. A scanned PDF needs its text first.':
     'Estes arquivos ainda não têm texto legível. Um PDF escaneado precisa primeiro do texto.',
-  'The coach runs in the botdanna desktop app, where your AI key is kept.':
-    'O coach funciona no app de desktop do botdanna, onde a sua chave de IA fica guardada.',
+  'The coach runs in the Botdanna desktop app, where your AI key is kept.':
+    'O coach funciona no app de desktop do Botdanna, onde a sua chave de IA fica guardada.',
   'Add an AI key to use the coach.': 'Adicione uma chave de IA para usar o coach.',
   'Ask a question about your files. Answers come only from them, and each one names its source.':
     'Pergunte sobre os seus arquivos. As respostas vêm só deles, e cada uma indica a fonte.',
@@ -1011,8 +1015,8 @@ export const APP_PT: Record<string, string> = {
   '{count} days streak': '{count} dias seguidos',
 
   // Updates
-  'Downloading botdanna {version} in the background.': 'Baixando o botdanna {version} em segundo plano.',
-  'botdanna {version} is ready. It installs when you close botdanna.': 'O botdanna {version} está pronto. Ele é instalado quando você fechar o botdanna.',
+  'Downloading Botdanna {version} in the background.': 'Baixando o Botdanna {version} em segundo plano.',
+  'Botdanna {version} is ready. It installs when you close Botdanna.': 'O Botdanna {version} está pronto. Ele é instalado quando você fechar o Botdanna.',
   'Restart to update': 'Reiniciar para atualizar',
 
   // What's new: the 0.5.0 release note
@@ -1022,7 +1026,7 @@ export const APP_PT: Record<string, string> = {
   'A report a friend shares opens as their report, with their name on it':
     'Um relatório compartilhado por um amigo abre como o relatório dele, com o nome dele',
   'Profile pictures of your friends show up as soon as you are friends': 'As fotos de perfil dos seus amigos aparecem assim que vocês são amigos',
-  'botdanna checks for new versions and installs them in the background': 'O botdanna verifica novas versões e as instala em segundo plano',
+  'Botdanna checks for new versions and installs them in the background': 'O Botdanna verifica novas versões e as instala em segundo plano',
   'The In use label in AI keys sits beside the key name': 'O aviso Em uso nas chaves de IA fica ao lado do nome da chave',
 
   // Coach chats, files and mentions
@@ -1080,12 +1084,12 @@ export const APP_PT: Record<string, string> = {
     'Novos simulados: leitura com listening, e escrita com fala, para cada nível e para a trilha TOEFL',
   'Practice sets you make with AI stay saved, on this device or in your account':
     'Os conjuntos de prática que você cria com a IA ficam salvos, neste aparelho ou na sua conta',
-  'The botdanna logo sits beside its name on the first screen': 'O logo do botdanna fica ao lado do nome na primeira tela',
+  'The Botdanna logo sits beside its name on the first screen': 'O logo do Botdanna fica ao lado do nome na primeira tela',
 
   // The search of the whole app, the listening voices, and checking for updates
   'Search': 'Buscar',
   'Clear search': 'Limpar busca',
-  'Search botdanna': 'Buscar no botdanna',
+  'Search Botdanna': 'Buscar no Botdanna',
   'Search lessons, tests, chats, files and pages': 'Buscar aulas, testes, chats, arquivos e telas',
   'Type a word. The search looks through every lesson, test, chat, file and page.':
     'Digite uma palavra. A busca procura em todas as aulas, testes, chats, arquivos e telas.',
@@ -1102,9 +1106,9 @@ export const APP_PT: Record<string, string> = {
   'Volume': 'Volume',
   'Preparing the voice…': 'Preparando a voz…',
   'Check for updates': 'Verificar atualizações',
-  'Updates are checked in the installed botdanna app.': 'As atualizações são verificadas no app do botdanna instalado.',
+  'Updates are checked in the installed Botdanna app.': 'As atualizações são verificadas no app do Botdanna instalado.',
   'Could not check for updates. Try again later.': 'Não foi possível verificar atualizações. Tente de novo mais tarde.',
-  'botdanna is up to date.': 'O botdanna está atualizado.',
+  'Botdanna is up to date.': 'O Botdanna está atualizado.',
 
   // The profile: the banner, the picture dialog, and a friend's profile
   'Edit banner': 'Editar banner',
@@ -1183,8 +1187,8 @@ export const APP_PT: Record<string, string> = {
     'As seções e páginas do Estudo livre abrem com suavidade: sem travamentos, e cada página começa no topo',
   'Buy me a coffee: find it at the bottom of the profile menu, and under About in Settings':
     'Me pague um café: fica no fim do menu do perfil e, em Configurações, logo abaixo de Sobre',
-  'Rate botdanna from 1 to 5 stars, with an optional comment, in Settings. Online accounts send it to the developer':
-    'Avalie o botdanna de 1 a 5 estrelas, com um comentário opcional, em Configurações. Contas online enviam a avaliação ao desenvolvedor',
+  'Rate Botdanna from 1 to 5 stars, with an optional comment, in Settings. Online accounts send it to the developer':
+    'Avalie o Botdanna de 1 a 5 estrelas, com um comentário opcional, em Configurações. Contas online enviam a avaliação ao desenvolvedor',
   // The 0.8.0 release note (What’s new)
   'Your AI keys are saved to your account, sealed with your password. Add a key once, and every device you sign in to can use it':
     'Suas chaves de IA são salvas na sua conta, protegidas com a sua senha. Adicione uma chave uma vez, e todo aparelho em que você entrar pode usá-la',
@@ -1226,8 +1230,8 @@ export const APP_PT: Record<string, string> = {
     'Hoje: o relatório de nível fica ao lado do cartão da sua prova, e a seta sumiu. O X ainda o tira do Hoje para sempre',
 
   // The 1.4.0 release note (What's new)
-  'Feedback: one message an hour. If you try again sooner, botdanna tells you how long to wait':
-    'Opinião: uma mensagem por hora. Se você tentar de novo antes, o botdanna mostra quanto tempo falta para enviar outra',
+  'Feedback: one message an hour. If you try again sooner, Botdanna tells you how long to wait':
+    'Opinião: uma mensagem por hora. Se você tentar de novo antes, o Botdanna mostra quanto tempo falta para enviar outra',
   'Today: a finished learning setup leaves the screen, and the level report can be removed from Today for good':
     'Hoje: as preferências de estudo saem da tela quando já estão concluídas, e o relatório de nível pode ser tirado do Hoje para sempre',
   'My report in the profile: your strengths, your weaknesses and your progress across the app. Save it as an image, with your name on it':
@@ -1235,8 +1239,8 @@ export const APP_PT: Record<string, string> = {
   'Share: a search bar finds your friends, results and sets, and the friends you shared with most recently come first. Share with a friend names that friend, with no Send to list':
     'Compartilhar: uma busca encontra seus amigos, resultados e conjuntos, e os amigos com quem você compartilhou mais recentemente aparecem primeiro. Compartilhar com um amigo mostra o nome da pessoa, sem a lista Enviar para',
   'The Buy me a coffee button is yellow, with dark text': 'O botão Me pague um café está amarelo, com texto escuro',
-  'Updates: botdanna tells you when a newer version is ready. Click the update button in the title bar to download it, then click Restart to update':
-    'Atualizações: o botdanna avisa quando uma versão nova está pronta. Clique no botão de atualização na barra de título para baixar, depois clique em Reiniciar para atualizar',
+  'Updates: Botdanna tells you when a newer version is ready. Click the update button in the title bar to download it, then click Restart to update':
+    'Atualizações: o Botdanna avisa quando uma versão nova está pronta. Clique no botão de atualização na barra de título para baixar, depois clique em Reiniciar para atualizar',
 
   // The 1.3.0 release note (What's new)
   'Word-order lessons: drag the words into the right order, or tap them. A wrong order stays open, so you can move the words and check again':
@@ -1690,7 +1694,7 @@ export const APP_PT: Record<string, string> = {
   'Study {count} flashcards': 'Estude {count} cartões',
   'Practise for {count} minutes': 'Pratique por {count} minutos',
 
-  // botdanna (AI only): the profile, the setup, the settings and the coach's focus cards
+  // Botdanna (AI only): the profile, the setup, the settings and the coach's focus cards
   'Help me improve my weakest skill, {skill}, with a short practice.': 'Me ajude a melhorar minha habilidade mais fraca, {skill}, com uma prática curta.',
   '{goal} · level {level}': '{goal} · nível {level}',
   'Your chats and files stay on this device.': 'Suas conversas e arquivos ficam neste dispositivo.',
@@ -1718,8 +1722,8 @@ export const APP_PT: Record<string, string> = {
   'Be honest. The coach adjusts as it learns how you write and speak.': 'Seja sincero. O coach se ajusta conforme aprende como você escreve e fala.',
   'AI key': 'Chave de IA',
   'Connect your AI key': 'Conecte sua chave de IA',
-  'botdanna is powered by your own key. Works with OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. You can skip this and add it later.':
-    'O botdanna funciona com a sua própria chave. Funciona com OpenAI, Anthropic, Google Gemini, OpenRouter ou DeepSeek. Você pode pular esta etapa e adicionar a chave depois.',
+  'Botdanna is powered by your own key. Works with OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. You can skip this and add it later.':
+    'O Botdanna funciona com a sua própria chave. Funciona com OpenAI, Anthropic, Google Gemini, OpenRouter ou DeepSeek. Você pode pular esta etapa e adicionar a chave depois.',
   'Your AI English coach, ready whenever you are.': 'Seu coach de inglês com IA, pronto quando você quiser.',
   'A coach that answers any question about English, at your level': 'Um coach que responde a qualquer dúvida sobre inglês, no seu nível',
   'Talk live with a voice coach, and practise speaking': 'Converse ao vivo com um coach por voz e pratique a fala',

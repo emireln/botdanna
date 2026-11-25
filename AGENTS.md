@@ -1,18 +1,18 @@
 # AGENTS.md
 
-Guidance for coding agents working on the botdanna desktop app in this repository. README.md is for people; this file is for agents. Read the Repositories section first: botdanna is one of DANNA's three repositories. It shares the same online accounts and the same database as DANNA, so changes here must not break that.
+Guidance for coding agents working on the Botdanna desktop app in this repository. README.md is for people; this file is for agents. Read the Repositories section first: Botdanna is one of Danna's three repositories. It shares the same online accounts and the same database as Danna, so changes here must not break that.
 
 ## What this is
 
-botdanna is an AI English coach for Windows: a chat coach with ten modes and role-play scenes, talk live with a 3D coach, a writing check, a library of your own files, and word help while you read. It is an Electron 45 shell around a React 19 and TypeScript interface built with Vite 8. Data lives on the device (SQLite through `node:sqlite`) or in an optional Supabase account. AI features use the learner's own provider key (OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek).
+Botdanna is an AI English coach for Windows: a chat coach with ten modes and role-play scenes, talk live with a 3D coach, a writing check, a library of your own files, and word help while you read. It is an Electron 45 shell around a React 19 and TypeScript interface built with Vite 8. Data lives on the device (SQLite through `node:sqlite`) or in an optional Supabase account. AI features use the learner's own provider key (OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek).
 
 ## Repositories
 
-- **This repository, `emireln/botdanna`** (public, branch `main`): the botdanna app, at the root of this folder. Every commit bumps the patch version (see Git and releases).
-- **`danna`, `emireln/danna`** (public, branch `main`): the DANNA desktop app. It is the sibling repository, and this folder sits inside its folder, git-ignored there. The two apps share accounts, the database and the `supabase/` folder, which is byte-identical in both.
-- **The website, `emireln/danna-website`** (private, branch `main`): the landing page (danna.run) and the hub and the account pages (hub.danna.run). In the DANNA folder it is `website/`. The hub links to the newest release of botdanna. It has no version number.
-- **The design** of all of them is in `website/DESIGN.md` (in the DANNA folder, or in `emireln/danna-website`): the brand, the tokens, the pages, the Classic look of both apps, the brand images and the repositories. Read it before any visible change.
-- **Never commit** the DANNA repository's files from here, and never commit this repository's files from DANNA.
+- **This repository, `emireln/botdanna`** (public, branch `main`): the Botdanna app, at the root of this folder. Every commit bumps the patch version (see Git and releases).
+- **`danna`, `emireln/danna`** (public, branch `main`): the Danna desktop app. It is the sibling repository, and this folder sits inside its folder, git-ignored there. The two apps share accounts, the database and the `supabase/` folder, which is byte-identical in both.
+- **The website, `emireln/danna-website`** (private, branch `main`): the landing page (danna.run) and the hub and the account pages (hub.danna.run). In the Danna folder it is `website/`. The hub links to the newest release of Botdanna. It has no version number.
+- **The design** of all of them is in `website/DESIGN.md` (in the Danna folder, or in `emireln/danna-website`): the brand, the tokens, the pages, the Classic look of both apps, the brand images and the repositories. Read it before any visible change.
+- **Never commit** the Danna repository's files from here, and never commit this repository's files from Danna.
 
 ## Commands
 
@@ -34,11 +34,11 @@ There is no CI. Run the checks yourself.
 - `electron/`: the desktop process. Window, tray, IPC, the local database, AI keys and providers, live talk, speech and updates.
 - `src/`: the React interface. `screens/` has one file per screen (Welcome, Auth, Setup, Coach, Live, Write, Library, Profile, Settings), `components/` the shared pieces, `state/` the providers, `lib/` the rules and backends, and `styles/` the two looks.
 - `src/lib/data/`: the `DataBackend` contract and its three implementations (see Architecture).
-- `supabase/`: `schema.sql` for fresh projects, `migrations/` for existing ones, and `tests/policies.test.mjs`. This folder is byte-identical to the DANNA repository's, because both apps use the same database. See the warning under Data, secrets and what not to commit.
+- `supabase/`: `schema.sql` for fresh projects, `migrations/` for existing ones, and `tests/policies.test.mjs`. This folder is byte-identical to the Danna repository's, because both apps use the same database. See the warning under Data, secrets and what not to commit.
 - `tests/`: node:test suites. Many load TypeScript through Vite's `createServer` and `ssrLoadModule`. Some render components to markup with `react-dom/server`.
 - `brand/`: the brand masters: `icon.png` and `logo.png` (from the designer), and `tray-icon.png` and `banner.png` (made from the logo by `npm run brand`). `build/`, `electron/assets/`, `public/favicon.webp` and `src/assets/` hold generated copies.
 - `scripts/`: the build helpers: `make-brand.mjs`, `make-icons.mjs`, `make-installer-art.mjs`, `make-platform-logos.mjs`, `make-avatars.mjs`, `fetch-tts-model.mjs`, `bump-version.mjs` and `release.mjs`.
-- `docs/`: the live coach design (`docs/live-coach.md`) and the botdanna scope notes (`docs/botdanna.md`).
+- `docs/`: the live coach design (`docs/live-coach.md`) and the Botdanna scope notes (`docs/botdanna.md`).
 
 ## Architecture
 
@@ -49,6 +49,7 @@ There is no CI. Run the checks yourself.
   - `src/lib/data/localBackend.ts` keeps data in browser storage, for `npm run web`.
 - The renderer reaches the main process only through `window.botdanna`. `electron/preload.cjs` exposes it, and `src/lib/bridge.ts` types it. The handlers are in `electron/main.cjs`, and every handler checks the sender.
 - AI keys are stored with Electron `safeStorage` (`electron/keystore.cjs`), and every provider request is made in `electron/ai.cjs`. A key crosses into the renderer only to be sealed for an account (`keys:export` and `keys:import`).
+- Google sign-in: the sign-in page opens in the browser through `auth:open-sign-in`, which opens only the project's Supabase Google page. The hub's `/app-botdanna` page sends the browser back to `botdanna://auth-callback` with the session in the address, and `electron/main.cjs` takes it only after a sign-in this app started (`electron/authLink.cjs`). `src/state/auth.tsx` sets the session. A Google account has no password, so the AI keys sealed with the password do not open on that sign-in.
 - The coach (`src/screens/CoachScreen.tsx`) builds each reply from `coachSystem` and `learnerContext` in `src/lib/ai.ts` and `src/lib/coachContext.ts`, the mode's instructions in `src/lib/coachModes.ts`, and the reply's cards in `src/lib/coachReply.ts`. Model output is parsed and clamped before use; `ROUTE_PATTERN` in `coachReply.ts` lists the only pages a card may open.
 - The writing check (`src/screens/WriteScreen.tsx`, rules in `src/lib/writingCheck.ts`) uses the model with a key and a few local rules without one. Its checks are saved as practice runs (`WRITING_REF`).
 - Talk live (`/coach/live`, switched off by `LIVE_TALK_ENABLED` in `src/lib/features.ts`): `electron/live.cjs` holds the Gemini Live session, and the renderer's `src/lib/live/` holds the microphone, the coach's voice (`voice.ts`, with the word timing in `wordTiming.ts`) and the conversation. `src/avatar/` mounts the coach with TalkingHead (MIT, `@met4citizen/talkinghead`), loaded only on that screen; its lip-sync modules are served from `public/talkinghead/`. The coach is a real person model in `public/characters/` (credits in `CREDITS.md`). See `docs/live-coach.md`.
@@ -73,17 +74,17 @@ There is no CI. Run the checks yourself.
 - Source files are stored with LF line endings.
 - A new `DataBackend` method goes into all three backends. On the desktop it also needs a handler in `electron/localdb.cjs`, and the parity test should cover it.
 - The limits shared by the desktop and online databases must change together, in `electron/localdb.cjs` and `src/lib/data/rules.ts`. The code comments say so.
-- For a schema change, add the next numbered file in `supabase/migrations/` (each one is safe to run twice) and keep `supabase/schema.sql` in step, so a fresh project gets the same schema. Desktop tables are created and upgraded in `electron/localdb.cjs`. DANNA uses the same database too, so make the change in both apps.
+- For a schema change, add the next numbered file in `supabase/migrations/` (each one is safe to run twice) and keep `supabase/schema.sql` in step, so a fresh project gets the same schema. Desktop tables are created and upgraded in `electron/localdb.cjs`. Danna uses the same database too, so make the change in both apps.
 - For a new IPC channel, update `electron/main.cjs`, `electron/preload.cjs` and `src/lib/bridge.ts` together.
 - Styles: the Classic tokens and rules are in `src/styles/app.css`, and the Playful ones in `src/styles/playful.css`. `src/styles/design.css` holds the Classic overrides of the website's design. `src/styles/frame.css` holds the window frame, the title bar, the wordmark and the welcome screens, and `src/styles/system.css` the shared screen pieces. Use a token for every colour; the Classic accent is coral (`--primary`, `#d52b50`).
-- **The name.** This app is written `botdanna`, lowercase, as its own name. Where a visible text names DANNA, write DANNA in capitals. Technical names stay as they are: `botdanna.*` storage keys, `botdanna.db`, `window.botdanna`, the identifiers, and the vault string `danna-ai-key:<provider>`, which is the one name shared with DANNA and must not change.
-- **The wordmark.** The wordmark uses the display face: Unbounded at weight 800 with tracking -0.02em (`.wordmark` and `.wordmark--xl` in `src/styles/frame.css`). It is the same face as the hero text on the website, and the same as DANNA's wordmark.
+- **The name.** Botdanna has only its B in capitals, as its own name. Where a visible text names Danna, write Danna. Technical names stay as they are: `botdanna.*` storage keys, `botdanna.db`, `window.botdanna`, the identifiers, and the vault string `danna-ai-key:<provider>`, which is the one name shared with Danna and must not change.
+- **The wordmark.** The wordmark uses the display face: Unbounded at weight 800 with tracking -0.02em (`.wordmark` and `.wordmark--xl` in `src/styles/frame.css`). It is the same face as the hero text on the website, and the same as Danna's wordmark.
 
 ## Generated files and brand images
 
 The masters are `brand/icon.png` and `brand/logo.png`, which come from the designer. `brand/tray-icon.png` and `brand/banner.png` are made from the logo. Edit the masters, then run the script; do not hand-edit an output.
 
-- `npm run brand`: writes `brand/tray-icon.png` (the logo, trimmed and centred at 88% of a 512 px square, in its own colours) and `brand/banner.png` (492 × 942 px: the accent colour, the logo in white centred at 70% of the width, nothing else). The accent is set in `scripts/make-brand.mjs` (`#d52b50` for botdanna).
+- `npm run brand`: writes `brand/tray-icon.png` (the logo, trimmed and centred at 88% of a 512 px square, in its own colours) and `brand/banner.png` (492 × 942 px: the accent colour, the logo in white centred at 70% of the width, nothing else). The accent is set in `scripts/make-brand.mjs` (`#d52b50` for Botdanna).
 - `npm run icons`: writes `build/icon.png`, `build/icon.ico`, `electron/assets/icon.png`, `electron/assets/tray.png` and `tray@2x.png`, `src/assets/icon.webp`, `src/assets/logo.webp` and `public/favicon.webp`.
 - `npm run installer-art`: writes `build/installerSidebar.bmp` and `build/uninstallerSidebar.bmp` from `brand/banner.png`.
 - `npm run logos`: writes the platform logos from `brand/platforms/` into `src/assets/platforms/`.
@@ -94,18 +95,18 @@ The masters are `brand/icon.png` and `brand/logo.png`, which come from the desig
 
 ## Data, secrets and what not to commit
 
-- `.env.development` and `.env.production` hold only public values: the project URL and the publishable key of the database that botdanna shares with DANNA. Never add a service-role or secret key to the app, and never commit `.env.local`.
-- Never commit `node_modules/`, `dist/`, `release/`, `resources/tts/` (it is fetched and about 100 MB), `botdanna.db`, or the DANNA repository's folders (`website/` and the DANNA files).
+- `.env.development` and `.env.production` hold only public values: the project URL and the publishable key of the database that Botdanna shares with Danna. Never add a service-role or secret key to the app, and never commit `.env.local`.
+- Never commit `node_modules/`, `dist/`, `release/`, `resources/tts/` (it is fetched and about 100 MB), `botdanna.db`, or the Danna repository's folders (`website/` and the Danna files).
 - Never log an AI key. Keys cross into the renderer only in the account sealing path (`keys:export` and `keys:import`).
 - Pictures that people upload are converted to WebP in the app (`prepareAvatar` and `prepareBanner`). The built-in avatars are already WebP, and nothing converts them at runtime.
-- Do not change anything that DANNA's accounts depend on. The account copy of each AI key is sealed with a vault key and bound to `danna-ai-key:<provider>` (`src/lib/vault.ts`), so changing that string, the vault derivation or the schema would stop keys saved by DANNA from opening here, and the other way round. Keep `supabase/` identical to DANNA's unless a migration is planned in both apps.
+- Do not change anything that Danna's accounts depend on. The account copy of each AI key is sealed with a vault key and bound to `danna-ai-key:<provider>` (`src/lib/vault.ts`), so changing that string, the vault derivation or the schema would stop keys saved by Danna from opening here, and the other way round. Keep `supabase/` identical to Danna's unless a migration is planned in both apps.
 
 ## Git and releases
 
 - Work lands on `main`. A short-lived branch is fine, but fast-forward `main`, push it, and delete the branch. Do not leave other branches behind.
 - Each commit bumps the patch version. `.husky/pre-commit` runs `scripts/bump-version.mjs`, which stages `package.json` and `package-lock.json`. For a feature release, run `npm run bump -- minor` and commit the result. A version written by hand in a commit is kept.
 - Commit messages use `type(scope): summary` in lowercase, for example `fix(coach): keep the reply language`. Put the reason in the body when it is not obvious.
-- **A release, in order.** Commit and push `main`. Then `rm -rf release` (the old installer), `npm run dist` (about 10 minutes: it fetches the voice, builds and packages the installer), and `npm run release`. `npm run release` publishes `vX.Y.Z` on `emireln/botdanna` from HEAD: HEAD must already be on `origin/main`, and the tree must be clean. It uploads the installer, its blockmap and `latest.yml`, which the auto-update reads. The release is titled `botdanna X.Y.Z`; its notes are the commit subjects since the previous tag. Check it with `gh release view vX.Y.Z --repo emireln/botdanna`.
+- **A release, in order.** Commit and push `main`. Then `rm -rf release` (the old installer), `npm run dist` (about 10 minutes: it fetches the voice, builds and packages the installer), and `npm run release`. `npm run release` publishes `vX.Y.Z` on `emireln/botdanna` from HEAD: HEAD must already be on `origin/main`, and the tree must be clean. It uploads the installer, its blockmap and `latest.yml`, which the auto-update reads. The release is titled `Botdanna X.Y.Z`; its notes are the commit subjects since the previous tag. Check it with `gh release view vX.Y.Z --repo emireln/botdanna`.
 - `npm run release` needs an authenticated `gh`. It publishes to the repository in `package.json` (`build.publish`).
 
 ## Before you finish
