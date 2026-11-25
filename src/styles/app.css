@@ -52,6 +52,15 @@
     --nav-h: 64px;
     --overlay-w: 0px;
     --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    /* The window frame: the coral accent around the white panel, deepest at the top, with a soft glow. The gutter is a
+       little narrower than the hub's, so the page has more room. */
+    --frame-a: #8f1a3c;
+    --frame-b: #a71d3c;
+    --frame-c: #f54161;
+    --frame-glow: rgba(255, 120, 150, 0.4);
+    --frame-gutter: 10px;
+    --frame-radius: 22px;
   }
 
   :root[data-desktop] {
@@ -914,7 +923,7 @@
   }
 
   .shell .scrim {
-    --scrim-bottom: var(--nav-h);
+    --scrim-bottom: calc(var(--nav-h) + var(--frame-gutter));
   }
 
   .sheet {
@@ -1000,7 +1009,7 @@
   .toast-stack {
     position: fixed;
     left: 50%;
-    bottom: calc(var(--nav-h) + 16px);
+    bottom: calc(var(--nav-h) + var(--frame-gutter) + 16px);
     transform: translateX(-50%);
     z-index: 60;
     display: flex;
