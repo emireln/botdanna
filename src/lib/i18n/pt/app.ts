@@ -1761,4 +1761,13 @@ export const APP_PT: Record<string, string> = {
   'The tabs sit under the screen, as on a phone.': 'As abas ficam embaixo da tela, como em um celular.',
   'The tabs sit in the title bar, next to the wordmark.': 'As abas ficam na barra do título, ao lado do nome do app.',
   'Saved on this device only. It is not kept in your account.': 'Salvo somente neste dispositivo. Não fica guardado na sua conta.',
+  // The 1.3.0 release note (What's new)
+  'The Classic look has the pill design: the cards, buttons, tabs and tags have the same rounded corners as the Playful look.':
+    'O visual Clássico tem o desenho de pílula: cartões, botões, abas e etiquetas têm os mesmos cantos arredondados do visual Divertido.',
+  'The field of the coach has no square outline when you click in it. The rounded box around it shows that the field has focus.':
+    'O campo do coach não tem contorno quadrado ao clicar nele. A caixa arredondada em volta mostra que o campo está em foco.',
+  'While the coach writes a reply, the send button turns red, as a stop button.':
+    'Enquanto o coach escreve uma resposta, o botão de enviar fica vermelho, como botão de parar.',
+  'The small labels above the page titles and the section headings are gone, so the screens read more quietly.':
+    'Os rótulos pequenos acima dos títulos das páginas e das seções sumiram, e as telas ficam mais tranquilas.',
 };
