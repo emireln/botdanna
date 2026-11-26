@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeftRight, LogOut, Settings, User } from 'lucide-react';
+import { ArrowLeftRight, Globe, LogOut, Settings, User } from 'lucide-react';
 import { Avatar } from './ui';
 import { bridge, type WindowState } from '../lib/bridge';
 import { useT } from '../lib/i18n/react';
@@ -11,6 +11,9 @@ import { useAuth } from '../state/auth';
 import { useAppData } from '../state/appData';
 import { useTabLayout } from '../state/tabLayout';
 import { TitleTabs } from './NavTabs';
+
+// The hub: the account page on the web. The title bar opens it in the browser, not in the app.
+const HUB_URL = 'https://hub.danna.run/';
 
 function useWindowControls() {
   const [maximized, setMaximized] = useState(false);
@@ -70,6 +73,11 @@ export function TitleBar() {
     navigate(path);
   };
 
+  const openHub = () => {
+    if (bridge) void bridge.openExternal(HUB_URL);
+    else window.open(HUB_URL, '_blank', 'noopener,noreferrer');
+  };
+
   return (
     <header className="titlebar">
       <Link to="/" className="wordmark" aria-label={t('Botdanna home')}>
@@ -80,6 +88,9 @@ export function TitleBar() {
 
       {showActions && (
         <div className="titlebar__actions">
+          <button className="btn btn--icon" onClick={openHub} aria-label={t('Open the hub')} title={t('Open the hub')}>
+            <Globe />
+          </button>
           <div className="menu-anchor" ref={anchor}>
             <button
               className="avatar-btn"
@@ -107,10 +118,10 @@ export function TitleBar() {
                   <button className="menu__item" role="menuitem" onClick={() => go('/profile')}>
                     <User /> {t('Profile')}
                   </button>
-                  <button className="menu__item" role="menuitem" onClick={() => go('/settings')}>
+                  <button className="menu__item" role="menuitem" onClick={() => go('/settings/general')}>
                     <Settings /> {t('Settings')}
                   </button>
-                  <button className="menu__item" role="menuitem" onClick={() => go('/settings')}>
+                  <button className="menu__item" role="menuitem" onClick={() => go('/settings/account')}>
                     <ArrowLeftRight /> {mode === 'supabase' ? t('Use on this device') : t('Use an online account')}
                   </button>
                   {mode === 'supabase' && (
