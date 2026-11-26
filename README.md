@@ -1,45 +1,37 @@
-# Botdanna
+<p align="center">
+  <img src="docs/banner.png" alt="Botdanna" width="100%">
+</p>
 
-**Your AI English coach.** Botdanna is a Windows app for learning English with a coach that answers any question, practises real situations with you, and checks your writing. It works with your own AI key, and it uses the same accounts and cloud data as [Danna](https://github.com/emireln/danna), so you can sign in with the same account in both apps.
+Botdanna is your AI English coach. Ask it anything about English, practise a real situation with a character, or get your writing checked. It uses your own AI key, and it shares accounts and cloud data with [Danna](https://github.com/emireln/danna), so one sign-in works in both apps.
 
-## What you can do
+**[Download for Windows](https://github.com/emireln/botdanna/releases/latest)**. Windows may warn that the app is unsigned: choose *More info*, then *Run anyway*.
 
-- **Chat with the coach.** Ask anything about English, or pick a way to work: conversation practice, fix my writing, speaking practice, exam practice, a grammar lesson, a vocabulary builder, read and discuss, or practise your mistakes. The coach adapts to your level and goal, and every reply can include exercises, a feedback card, vocabulary to save, and quick replies.
-- **Role-play scenes.** Practise real situations with a character: ordering at a café, a job interview, a hotel check-in, a complaint at a shop, and more. A scene ends with a short summary of what went well.
-- **Writing check.** Write up to 1,500 words. The check gives a score, a tone, and a fix for each issue, with the reason written in your language. Take the fixes you agree with.
-- **Your files.** Keep PDF, TXT and Markdown files and learning links in your library. Ask the coach about them, and tap a word while you read to see its meaning and save it for review.
-- **Listen.** Read-aloud uses a built-in voice that works offline, or a Windows voice, or an OpenAI or Gemini voice with your key.
-- **Your way.** Classic or Playful look, English or Português (Brasil).
+<p align="center">
+  <img src="docs/screenshots/settings.jpg" alt="Settings, with a page for each section" width="49%">
+  <img src="docs/screenshots/write.jpg" alt="The writing check, with its scores" width="49%">
+</p>
 
-## Your AI key
+## What it does
 
-Botdanna works with your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. The key is encrypted on your computer with the protection Windows provides, and your messages go straight from the app to the provider you chose.
+- **Coach.** Chat about grammar, vocabulary, reading or your own mistakes. Replies can include exercises, feedback cards and words to save.
+- **Role-play scenes.** Practise ordering at a café, a job interview or a hotel check-in. Each scene ends with a short summary.
+- **Writing check.** Up to 1,500 words, with a score and the reason for each fix.
+- **Your files.** Keep PDF, TXT and Markdown files, ask the coach about them, and tap a word while you read.
+- **Listen.** Read-aloud with a built-in voice that works offline, a Windows voice, or an OpenAI or Gemini voice with your key.
 
-- The coach, the writing check, the word help and the practice all use the chat model of the provider you choose.
-- Speech-to-text (speaking practice and the coach's microphone) needs an OpenAI or Gemini key.
+## Your key and your data
 
-## Accounts and data
+Bring a key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. Windows encrypts it on your computer. Each coach reply goes to the provider you chose, with the recent messages, the files you attached and a short summary of your learning. Your name and email are never included.
 
-- **With an online account**, your chats, files, profile and AI keys (sealed with your password) are kept in that account, the same one Danna uses.
-- **On this device**, everything stays on your computer, and nothing is sent anywhere except to the AI provider when you ask the coach something.
+With an online account, your chats, files and keys (sealed with your password) are kept in the same account Danna uses.
 
-## Install
+## Run it from source
 
-Download `botdanna-setup-<version>-x64.exe` from the latest release and run it. Windows may warn about an unsigned app. Choose *More info*, then *Run anyway* if you trust the source.
-
-## Privacy
-
-- Each coach reply is sent to the provider you chose, with the recent messages of the chat, the files you attached, and a short summary of your learning: your level, goal, exam date, skill scores and recent mistakes. Your name and email are not included.
-
-## For developers
-
-```powershell
-npm ci            # install, and set up the git hooks
-npm run dev       # the desktop app, with hot reload
-npm run web       # the interface in a browser (no AI keys, tray or files)
-npm test          # every test
-npm run typecheck
-npm run dist      # the Windows installer in release/
+```bash
+npm ci
+npm run dev   # the desktop app, with hot reload
+npm run web   # the interface in a browser, without AI keys or files
+npm test
 ```
 
-`AGENTS.md` describes the layout, the rules the tests enforce, and how the database is shared with Danna. `docs/botdanna.md` explains what was kept from Danna and what was left out.
+Danna, the English course, lives in [its own repository](https://github.com/emireln/danna). `AGENTS.md` describes the layout for contributors, and `docs/botdanna.md` explains what was kept from Danna.
