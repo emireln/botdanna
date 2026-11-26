@@ -104,7 +104,8 @@ function AppRoutes() {
         <Route path="write" element={<WriteScreen />} />
         <Route path="library" element={<LibraryScreen />} />
         <Route path="profile" element={<ProfileScreen />} />
-        <Route path="settings" element={<SettingsScreen />} />
+        <Route path="settings" element={<Navigate to="/settings/general" replace />} />
+        <Route path="settings/:section" element={<SettingsScreen />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

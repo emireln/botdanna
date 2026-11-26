@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Cloud, Laptop, PanelBottom, PanelTop, Play, Star, Trash2, Volume2 } from 'lucide-react';
+import { NavLink, Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Cloud, CircleHelp, Laptop, PanelBottom, PanelTop, Play, SlidersHorizontal, Sparkles, Star, Trash2, UserRound, Volume2 } from 'lucide-react';
 import { LanguageSwitch } from '../components/LanguageSwitch';
 import { KeyConnect, PROVIDER_LABEL } from '../components/KeyConnect';
 import { LookPicker } from '../components/LookPicker';
@@ -24,9 +24,20 @@ import { useTabLayout } from '../state/tabLayout';
 import { useToast } from '../state/toast';
 import type { AIModel, LookId, Provider } from '../lib/types';
 
+// The pages of Settings. Each one has an address of its own, so a link to it and the back button both work.
+const SECTIONS = [
+  { id: 'general', label: 'General', icon: SlidersHorizontal },
+  { id: 'account', label: 'Account', icon: UserRound },
+  { id: 'sounds', label: 'Sounds', icon: Volume2 },
+  { id: 'ai', label: 'AI and voice', icon: Sparkles },
+  { id: 'about', label: 'About and help', icon: CircleHelp },
+];
+
 export function SettingsScreen() {
   const navigate = useNavigate();
   const t = useT();
+  const { section } = useParams();
+  const page = SECTIONS.find((item) => item.id === section);
   const { mode, email, signOut, moveToDevice, backend, vaultError } = useAuth();
   const ai = useAI();
   const { refresh, profile, patchProfile } = useAppData();
@@ -314,471 +325,529 @@ export function SettingsScreen() {
     { id: 'coach', title: t('Coach reply'), text: t('A gentle glide when the coach answers.') },
   ];
 
+  if (!page) return <Navigate to="/settings/general" replace />;
+
   return (
     <div className="page">
-      <PageHeader title={t('Settings')} />
+      <div className="settings">
+        <nav className="settings-nav" aria-label={t('Settings sections')}>
+          {SECTIONS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.id}
+                to={`/settings/${item.id}`}
+                className={({ isActive }) => `settings-nav__item${isActive ? ' is-active' : ''}`}
+              >
+                <Icon aria-hidden="true" />
+                <span>{t(item.label)}</span>
+              </NavLink>
+            );
+          })}
+        </nav>
 
-      <SectionTitle title={t('App language')} />
-      <div className="settings-row">
-        <div className="settings-row__body">
-          <div className="settings-row__text">{t('Menus and the coach use this language.')}</div>
-        </div>
-        <LanguageSwitch />
-      </div>
+        <div className="settings-page">
+          <PageHeader title={t(page.label)} />
 
-      <SectionTitle title={t('Look')} />
-      <p className="muted">{t('Your look is saved to your account. Without an account it is kept on this device.')}</p>
-      <LookPicker value={look} disabled={savingLook} onChange={(next) => void chooseLook(next)} />
-
-      <SectionTitle title={t('Tabs')} />
-      <div className="mode-grid" role="radiogroup" aria-label={t('Tabs')}>
-        <button type="button" role="radio" aria-checked={tabLayout === 'bottom'} className="mode-card" onClick={() => setTabLayout('bottom')}>
-          <span className="mode-card__icon">
-            <PanelBottom aria-hidden="true" />
-          </span>
-          <span className="mode-card__title">{t('At the bottom')}</span>
-          <span className="mode-card__text">{t('The tabs sit under the screen, as on a phone.')}</span>
-          <span className="mode-card__tick">{tabLayout === 'bottom' && <span aria-hidden="true">✓</span>}</span>
-        </button>
-        <button type="button" role="radio" aria-checked={tabLayout === 'top'} className="mode-card" onClick={() => setTabLayout('top')}>
-          <span className="mode-card__icon">
-            <PanelTop aria-hidden="true" />
-          </span>
-          <span className="mode-card__title">{t('In the title bar')}</span>
-          <span className="mode-card__text">{t('The tabs sit in the title bar, next to the wordmark.')}</span>
-          <span className="mode-card__tick">{tabLayout === 'top' && <span aria-hidden="true">✓</span>}</span>
-        </button>
-      </div>
-      <p className="muted small">{t('Saved on this device only. It is not kept in your account.')}</p>
-
-      <SectionTitle title={t('How you use Botdanna')} />
-      <div className="mode-grid" role="radiogroup" aria-label={t('How you use Botdanna')}>
-        <button
-          role="radio"
-          aria-checked={mode === 'local'}
-          className="mode-card"
-          onClick={() => {
-            if (mode === 'supabase') setSwitchOpen(true);
-          }}
-        >
-          <span className="mode-card__icon">
-            <Laptop aria-hidden="true" />
-          </span>
-          <span className="mode-card__title">{t('On this device')}</span>
-          <span className="mode-card__text">{t('Everything stays on this device.')}</span>
-          <span className="mode-card__tick">{mode === 'local' && <span aria-hidden="true">✓</span>}</span>
-        </button>
-        <button
-          role="radio"
-          aria-checked={mode === 'supabase'}
-          className="mode-card"
-          disabled={!online}
-          onClick={() => {
-            if (mode === 'local') navigate('/auth', { state: { next: '/settings', switchingFrom: 'local' } });
-          }}
-        >
-          <span className="mode-card__icon">
-            <Cloud aria-hidden="true" />
-          </span>
-          <span className="mode-card__title">{t('Online account')}</span>
-          <span className="mode-card__text">{online ? t('Sync your chats and files across your devices.') : t('Not available yet.')}</span>
-          <span className="mode-card__tick">{mode === 'supabase' && <span aria-hidden="true">✓</span>}</span>
-        </button>
-      </div>
-
-      <SectionTitle title={t('Sounds')} />
-      <div className="stack">
-        <div className="settings-row">
-          <div className="settings-row__body">
-            <div className="settings-row__title">{t('Sounds in Botdanna')}</div>
-            <div className="settings-row__text">{t('Short, friendly sounds for your answers and the coach.')}</div>
-          </div>
-          <button
-            role="switch"
-            aria-checked={sounds.enabled}
-            aria-label={t('Sounds in Botdanna')}
-            className="switch"
-            onClick={() => changeSounds({ ...sounds, enabled: !sounds.enabled })}
-          >
-            <span className="switch__thumb" />
-          </button>
-        </div>
-
-        <div className="settings-row">
-          <div className="settings-row__body">
-            <div className="settings-row__title">{t('Volume')}</div>
-          </div>
-          <input
-            type="range"
-            min={0}
-            max={100}
-            step={5}
-            value={sounds.volume}
-            aria-label={t('Volume')}
-            style={{ width: 180, accentColor: 'var(--primary)' }}
-            onChange={(event) => changeSounds({ ...sounds, volume: Number(event.target.value) })}
-          />
-        </div>
-
-        {soundRows.map((row) => (
-          <div className="settings-row" key={row.id}>
-            <div className="settings-row__body">
-              <div className="settings-row__title">{row.title}</div>
-              <div className="settings-row__text">{row.text}</div>
-            </div>
-            <button className="btn btn--ghost btn--sm" onClick={() => previewSound(row.id)} aria-label={t('Play {sound}', { sound: row.title })}>
-              <Play aria-hidden="true" /> {t('Listen')}
-            </button>
-            <button
-              role="switch"
-              aria-checked={sounds.items[row.id]}
-              aria-label={row.title}
-              className="switch"
-              disabled={!sounds.enabled}
-              onClick={() => changeSounds({ ...sounds, items: { ...sounds.items, [row.id]: !sounds.items[row.id] } })}
-            >
-              <span className="switch__thumb" />
-            </button>
-          </div>
-        ))}
-      </div>
-
-      <SectionTitle title={t('AI assistant')} />
-      <div className="stack">
-        <p className="small muted">
-          {t(
-            'Bring your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. It powers the coach and the writing check. The key stays on this device.',
-          )}
-        </p>
-
-        <KeyConnect
-          onConnected={(connection) => {
-            setModelsFor(connection.provider);
-            setModels(connection.models);
-          }}
-        />
-        {error && <Notice tone="error">{error}</Notice>}
-
-        {ai.desktop && ai.connections.length === 0 && (
-          <Empty title={t('No key connected yet')}>{t('Paste a key above to unlock the assistant.')}</Empty>
-        )}
-
-        {ai.connections.length > 0 && (
-          <div className="set-list">
-            {ai.connections.map((connection) => {
-              const active = ai.selection?.provider === connection.provider;
-              const loadingThis = loadingModels && modelsFor === connection.provider;
-              return (
-                <div key={connection.provider} className="connection">
-                  <div className="connection__body">
-                    <div className="row row--wrap">
-                      <span className="connection__name">{connection.label}</span>
-                      {active && <span className="latest">{t('In use')}</span>}
-                    </div>
-                    <div className="small muted">
-                      {t('Ends in {last}', { last: connection.masked.slice(-4) })}
-                      {connection.source === 'account' && ` · ${t('Saved in your account')}`}
-                    </div>
-                  </div>
-                  <button className="btn btn--ghost btn--sm" onClick={() => showModels(connection.provider)} disabled={loadingThis}>
-                    {loadingThis ? <Spinner dark /> : null} {t('Models')}
-                  </button>
-                  <button
-                    className="btn btn--icon"
-                    onClick={() => setKeyToRemove(connection.provider)}
-                    aria-label={t('Remove {label} key', { label: connection.label })}
-                  >
-                    <Trash2 />
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {ai.accountKeys && ai.connections.length > 0 && (
-          <p className="small muted">
-            {t('Your keys are sealed with your account password before they are saved, so only you can open them.')}
-          </p>
-        )}
-        {ai.unreadable.length > 0 && (
-          <Notice tone="warn">
-            {t('Some keys saved in your account could not be opened with this password. Add them again to replace them.')}
-          </Notice>
-        )}
-        {ai.keysLocked && (
-          <div className="account-box">
-            <p className="settings-row__text">
-              {t('Your AI keys can be saved to your account, sealed with your password. Enter it once on this device.')}
-            </p>
-            {vaultError && <Notice tone="error">{t('Your AI keys could not be saved to your account: {reason}', { reason: vaultError })}</Notice>}
-            <div className="row row--wrap">
-              <input
-                className="input"
-                type="password"
-                autoComplete="current-password"
-                value={unlockPassword}
-                onChange={(event) => setUnlockPassword(event.target.value)}
-                placeholder={t('Account password')}
-                aria-label={t('Account password')}
-                style={{ flex: 1, minWidth: 220 }}
-              />
-              <button className="btn btn--primary" onClick={() => void unlockNow()} disabled={!unlockPassword || unlocking}>
-                {unlocking ? <Spinner /> : null} {t('Save my keys to my account')}
-              </button>
-            </div>
-            {unlockError && <Notice tone="error">{t(unlockError)}</Notice>}
-          </div>
-        )}
-        {ai.syncError && (
-          <div className="stack--tight">
-            <Notice tone="error">{t('Your AI keys could not be saved to your account: {reason}', { reason: t(ai.syncError) })}</Notice>
-            <button className="btn btn--ghost btn--sm self-start" onClick={() => void ai.syncNow()}>
-              {t('Try again')}
-            </button>
-          </div>
-        )}
-
-        {modelsFor && models.length > 0 && (
-          <div className="stack--tight">
-            <span className="field__label">{t('Choose a model')}</span>
-            <div className="model-list" role="radiogroup" aria-label={t('Models')}>
-              {models.map((model) => {
-                const selected = ai.selection?.provider === modelsFor && ai.selection?.model === model.id;
-                return (
-                  <button key={model.id} role="radio" aria-checked={selected} className="model" onClick={() => choose(modelsFor, model.id)}>
-                    <span className="model__radio" aria-hidden="true" />
-                    <span className="model__label">{model.label}</span>
-                    {model.latest && <span className="latest">{t('Newest')}</span>}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {bridge && settings && (
-        <>
-          <SectionTitle title={t('Listening voice')} />
-          <div className="stack">
-            <VoicePicker value={settings.voice} onChoose={(choice) => void saveVoice(choice)} />
-            <label className="volume">
-              <span className="volume__label">{t('Volume')}</span>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={5}
-                value={settings.voiceVolume}
-                onChange={(event) => saveVolume(Number(event.target.value))}
-                aria-valuetext={`${settings.voiceVolume}%`}
-              />
-              <output className="volume__value">{settings.voiceVolume}%</output>
-            </label>
-            <div>
-              <button className="btn btn--ghost btn--sm" onClick={playSample}>
-                {sampling ? <Volume2 aria-hidden="true" /> : <Play aria-hidden="true" />} {sampling ? t('Stop the sample') : t('Play a sample')}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {bridge && settings && (
-        <>
-          <SectionTitle title={t('Window')} />
-          <div className="settings-row">
-            <div className="settings-row__body">
-              <div className="settings-row__title">{t('Keep Botdanna in the tray')}</div>
-              <div className="settings-row__text">{t('Closing the window keeps practice running. Open it again from the tray icon.')}</div>
-            </div>
-            <button
-              role="switch"
-              aria-checked={settings.closeToTray}
-              aria-label={t('Keep Botdanna in the tray when the window closes')}
-              className="switch"
-              onClick={toggleTray}
-            >
-              <span className="switch__thumb" />
-            </button>
-          </div>
-        </>
-      )}
-
-      {mode === 'supabase' && (
-        <>
-          <SectionTitle title={t('Account')} />
-          <div className="stack">
-            {deviceHasProgress && (
+          {page.id === 'general' && (
+            <>
+              <SectionTitle title={t('App language')} />
               <div className="settings-row">
                 <div className="settings-row__body">
-                  <div className="settings-row__title">{t('Data saved on this device')}</div>
-                  <div className="settings-row__text">{t('Chats, files, your picture and your profile can be added to your account.')}</div>
+                  <div className="settings-row__text">{t('Menus and the coach use this language.')}</div>
                 </div>
-                <button className="btn btn--ghost btn--sm" onClick={() => setAddOpen(true)}>
-                  {t('Add to my account')}
+                <LanguageSwitch />
+              </div>
+        
+              <SectionTitle title={t('Look')} />
+              <p className="muted">{t('Your look is saved to your account. Without an account it is kept on this device.')}</p>
+              <LookPicker value={look} disabled={savingLook} onChange={(next) => void chooseLook(next)} />
+        
+              <SectionTitle title={t('Tabs')} />
+              <div className="mode-grid" role="radiogroup" aria-label={t('Tabs')}>
+                <button type="button" role="radio" aria-checked={tabLayout === 'bottom'} className="mode-card" onClick={() => setTabLayout('bottom')}>
+                  <span className="mode-card__icon">
+                    <PanelBottom aria-hidden="true" />
+                  </span>
+                  <span className="mode-card__title">{t('At the bottom')}</span>
+                  <span className="mode-card__text">{t('The tabs sit under the screen, as on a phone.')}</span>
+                  <span className="mode-card__tick">{tabLayout === 'bottom' && <span aria-hidden="true">✓</span>}</span>
+                </button>
+                <button type="button" role="radio" aria-checked={tabLayout === 'top'} className="mode-card" onClick={() => setTabLayout('top')}>
+                  <span className="mode-card__icon">
+                    <PanelTop aria-hidden="true" />
+                  </span>
+                  <span className="mode-card__title">{t('In the title bar')}</span>
+                  <span className="mode-card__text">{t('The tabs sit in the title bar, next to the wordmark.')}</span>
+                  <span className="mode-card__tick">{tabLayout === 'top' && <span aria-hidden="true">✓</span>}</span>
                 </button>
               </div>
-            )}
-            <div className="settings-row">
-              <div className="settings-row__body">
-                <div className="settings-row__title">{email ?? t('Signed in')}</div>
-                <div className="settings-row__text">{t('Your chats and files are saved to your account.')}</div>
-              </div>
-              <button
-                className="btn btn--ghost btn--sm"
-                onClick={async () => {
-                  await signOut();
-                  navigate('/auth', { replace: true });
-                }}
-              >
-                {t('Sign out')}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+              <p className="muted small">{t('Saved on this device only. It is not kept in your account.')}</p>
+            </>
+          )}
 
-      <SectionTitle title={t('About')} />
-      <div className="stack">
-        <div className="settings-row">
-          <div className="settings-row__body">
-            <div className="settings-row__title">Botdanna {version}</div>
-            {update.state === 'downloading' && update.version && (
-              <div className="settings-row__text">{t('Downloading Botdanna {version} in the background.', { version: update.version })}</div>
-            )}
-            {update.state === 'available' && update.version && (
-              <div className="settings-row__text">{t('Botdanna {version} is available. Download it when you like.', { version: update.version })}</div>
-            )}
-            {update.state === 'ready' && update.version && (
-              <div className="settings-row__text">{t('Botdanna {version} is ready. It installs when you close Botdanna.', { version: update.version })}</div>
-            )}
-          </div>
-          {update.state === 'available' && (
-            <button className="btn btn--primary btn--sm" onClick={() => void bridge?.update.download()}>
-              {t('Download update')}
-            </button>
+          {page.id === 'account' && (
+            <>
+              <SectionTitle title={t('How you use Botdanna')} />
+              <div className="mode-grid" role="radiogroup" aria-label={t('How you use Botdanna')}>
+                <button
+                  role="radio"
+                  aria-checked={mode === 'local'}
+                  className="mode-card"
+                  onClick={() => {
+                    if (mode === 'supabase') setSwitchOpen(true);
+                  }}
+                >
+                  <span className="mode-card__icon">
+                    <Laptop aria-hidden="true" />
+                  </span>
+                  <span className="mode-card__title">{t('On this device')}</span>
+                  <span className="mode-card__text">{t('Everything stays on this device.')}</span>
+                  <span className="mode-card__tick">{mode === 'local' && <span aria-hidden="true">✓</span>}</span>
+                </button>
+                <button
+                  role="radio"
+                  aria-checked={mode === 'supabase'}
+                  className="mode-card"
+                  disabled={!online}
+                  onClick={() => {
+                    if (mode === 'local') navigate('/auth', { state: { next: '/settings/account', switchingFrom: 'local' } });
+                  }}
+                >
+                  <span className="mode-card__icon">
+                    <Cloud aria-hidden="true" />
+                  </span>
+                  <span className="mode-card__title">{t('Online account')}</span>
+                  <span className="mode-card__text">{online ? t('Sync your chats and files across your devices.') : t('Not available yet.')}</span>
+                  <span className="mode-card__tick">{mode === 'supabase' && <span aria-hidden="true">✓</span>}</span>
+                </button>
+              </div>
+            </>
           )}
-          {update.state === 'ready' && (
-            <button className="btn btn--primary btn--sm" onClick={() => void bridge?.update.install()}>
-              {t('Restart to update')}
-            </button>
+
+          {page.id === 'sounds' && (
+            <>
+              <SectionTitle title={t('Sounds')} />
+              <div className="stack">
+                <div className="settings-row">
+                  <div className="settings-row__body">
+                    <div className="settings-row__title">{t('Sounds in Botdanna')}</div>
+                    <div className="settings-row__text">{t('Short, friendly sounds for your answers and the coach.')}</div>
+                  </div>
+                  <button
+                    role="switch"
+                    aria-checked={sounds.enabled}
+                    aria-label={t('Sounds in Botdanna')}
+                    className="switch"
+                    onClick={() => changeSounds({ ...sounds, enabled: !sounds.enabled })}
+                  >
+                    <span className="switch__thumb" />
+                  </button>
+                </div>
+        
+                <div className="settings-row">
+                  <div className="settings-row__body">
+                    <div className="settings-row__title">{t('Volume')}</div>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={sounds.volume}
+                    aria-label={t('Volume')}
+                    style={{ width: 180, accentColor: 'var(--primary)' }}
+                    onChange={(event) => changeSounds({ ...sounds, volume: Number(event.target.value) })}
+                  />
+                </div>
+        
+                {soundRows.map((row) => (
+                  <div className="settings-row" key={row.id}>
+                    <div className="settings-row__body">
+                      <div className="settings-row__title">{row.title}</div>
+                      <div className="settings-row__text">{row.text}</div>
+                    </div>
+                    <button className="btn btn--ghost btn--sm" onClick={() => previewSound(row.id)} aria-label={t('Play {sound}', { sound: row.title })}>
+                      <Play aria-hidden="true" /> {t('Listen')}
+                    </button>
+                    <button
+                      role="switch"
+                      aria-checked={sounds.items[row.id]}
+                      aria-label={row.title}
+                      className="switch"
+                      disabled={!sounds.enabled}
+                      onClick={() => changeSounds({ ...sounds, items: { ...sounds.items, [row.id]: !sounds.items[row.id] } })}
+                    >
+                      <span className="switch__thumb" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
-          {bridge && (
-            <button className="btn btn--ghost btn--sm" onClick={() => void checkUpdates()} disabled={checking}>
-              {checking ? <Spinner dark /> : null} {t('Check for updates')}
-            </button>
+
+          {page.id === 'ai' && (
+            <>
+              <SectionTitle title={t('AI assistant')} />
+              <div className="stack">
+                <p className="small muted">
+                  {t(
+                    'Bring your own key from OpenAI, Anthropic, Google Gemini, OpenRouter or DeepSeek. It powers the coach and the writing check. The key stays on this device.',
+                  )}
+                </p>
+        
+                <KeyConnect
+                  onConnected={(connection) => {
+                    setModelsFor(connection.provider);
+                    setModels(connection.models);
+                  }}
+                />
+                {error && <Notice tone="error">{error}</Notice>}
+        
+                {ai.desktop && ai.connections.length === 0 && (
+                  <Empty title={t('No key connected yet')}>{t('Paste a key above to unlock the assistant.')}</Empty>
+                )}
+        
+                {ai.connections.length > 0 && (
+                  <div className="set-list">
+                    {ai.connections.map((connection) => {
+                      const active = ai.selection?.provider === connection.provider;
+                      const loadingThis = loadingModels && modelsFor === connection.provider;
+                      return (
+                        <div key={connection.provider} className="connection">
+                          <div className="connection__body">
+                            <div className="row row--wrap">
+                              <span className="connection__name">{connection.label}</span>
+                              {active && <span className="latest">{t('In use')}</span>}
+                            </div>
+                            <div className="small muted">
+                              {t('Ends in {last}', { last: connection.masked.slice(-4) })}
+                              {connection.source === 'account' && ` · ${t('Saved in your account')}`}
+                            </div>
+                          </div>
+                          <button className="btn btn--ghost btn--sm" onClick={() => showModels(connection.provider)} disabled={loadingThis}>
+                            {loadingThis ? <Spinner dark /> : null} {t('Models')}
+                          </button>
+                          <button
+                            className="btn btn--icon"
+                            onClick={() => setKeyToRemove(connection.provider)}
+                            aria-label={t('Remove {label} key', { label: connection.label })}
+                          >
+                            <Trash2 />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+        
+                {ai.accountKeys && ai.connections.length > 0 && (
+                  <p className="small muted">
+                    {t('Your keys are sealed with your account password before they are saved, so only you can open them.')}
+                  </p>
+                )}
+                {ai.unreadable.length > 0 && (
+                  <Notice tone="warn">
+                    {t('Some keys saved in your account could not be opened with this password. Add them again to replace them.')}
+                  </Notice>
+                )}
+                {ai.keysLocked && (
+                  <div className="account-box">
+                    <p className="settings-row__text">
+                      {t('Your AI keys can be saved to your account, sealed with your password. Enter it once on this device.')}
+                    </p>
+                    {vaultError && <Notice tone="error">{t('Your AI keys could not be saved to your account: {reason}', { reason: vaultError })}</Notice>}
+                    <div className="row row--wrap">
+                      <input
+                        className="input"
+                        type="password"
+                        autoComplete="current-password"
+                        value={unlockPassword}
+                        onChange={(event) => setUnlockPassword(event.target.value)}
+                        placeholder={t('Account password')}
+                        aria-label={t('Account password')}
+                        style={{ flex: 1, minWidth: 220 }}
+                      />
+                      <button className="btn btn--primary" onClick={() => void unlockNow()} disabled={!unlockPassword || unlocking}>
+                        {unlocking ? <Spinner /> : null} {t('Save my keys to my account')}
+                      </button>
+                    </div>
+                    {unlockError && <Notice tone="error">{t(unlockError)}</Notice>}
+                  </div>
+                )}
+                {ai.syncError && (
+                  <div className="stack--tight">
+                    <Notice tone="error">{t('Your AI keys could not be saved to your account: {reason}', { reason: t(ai.syncError) })}</Notice>
+                    <button className="btn btn--ghost btn--sm self-start" onClick={() => void ai.syncNow()}>
+                      {t('Try again')}
+                    </button>
+                  </div>
+                )}
+        
+                {modelsFor && models.length > 0 && (
+                  <div className="stack--tight">
+                    <span className="field__label">{t('Choose a model')}</span>
+                    <div className="model-list" role="radiogroup" aria-label={t('Models')}>
+                      {models.map((model) => {
+                        const selected = ai.selection?.provider === modelsFor && ai.selection?.model === model.id;
+                        return (
+                          <button key={model.id} role="radio" aria-checked={selected} className="model" onClick={() => choose(modelsFor, model.id)}>
+                            <span className="model__radio" aria-hidden="true" />
+                            <span className="model__label">{model.label}</span>
+                            {model.latest && <span className="latest">{t('Newest')}</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+
+          {page.id === 'ai' && (
+            <>
+              {bridge && settings && (
+                <>
+                  <SectionTitle title={t('Listening voice')} />
+                  <div className="stack">
+                    <VoicePicker value={settings.voice} onChoose={(choice) => void saveVoice(choice)} />
+                    <label className="volume">
+                      <span className="volume__label">{t('Volume')}</span>
+                      <input
+                        type="range"
+                        min={0}
+                        max={100}
+                        step={5}
+                        value={settings.voiceVolume}
+                        onChange={(event) => saveVolume(Number(event.target.value))}
+                        aria-valuetext={`${settings.voiceVolume}%`}
+                      />
+                      <output className="volume__value">{settings.voiceVolume}%</output>
+                    </label>
+                    <div>
+                      <button className="btn btn--ghost btn--sm" onClick={playSample}>
+                        {sampling ? <Volume2 aria-hidden="true" /> : <Play aria-hidden="true" />} {sampling ? t('Stop the sample') : t('Play a sample')}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {page.id === 'general' && (
+            <>
+              {bridge && settings && (
+                <>
+                  <SectionTitle title={t('Window')} />
+                  <div className="settings-row">
+                    <div className="settings-row__body">
+                      <div className="settings-row__title">{t('Keep Botdanna in the tray')}</div>
+                      <div className="settings-row__text">{t('Closing the window keeps practice running. Open it again from the tray icon.')}</div>
+                    </div>
+                    <button
+                      role="switch"
+                      aria-checked={settings.closeToTray}
+                      aria-label={t('Keep Botdanna in the tray when the window closes')}
+                      className="switch"
+                      onClick={toggleTray}
+                    >
+                      <span className="switch__thumb" />
+                    </button>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {page.id === 'account' && (
+            <>
+              {mode === 'supabase' && (
+                <>
+                  <SectionTitle title={t('Account')} />
+                  <div className="stack">
+                    {deviceHasProgress && (
+                      <div className="settings-row">
+                        <div className="settings-row__body">
+                          <div className="settings-row__title">{t('Data saved on this device')}</div>
+                          <div className="settings-row__text">{t('Chats, files, your picture and your profile can be added to your account.')}</div>
+                        </div>
+                        <button className="btn btn--ghost btn--sm" onClick={() => setAddOpen(true)}>
+                          {t('Add to my account')}
+                        </button>
+                      </div>
+                    )}
+                    <div className="settings-row">
+                      <div className="settings-row__body">
+                        <div className="settings-row__title">{email ?? t('Signed in')}</div>
+                        <div className="settings-row__text">{t('Your chats and files are saved to your account.')}</div>
+                      </div>
+                      <button
+                        className="btn btn--ghost btn--sm"
+                        onClick={async () => {
+                          await signOut();
+                          navigate('/auth', { replace: true });
+                        }}
+                      >
+                        {t('Sign out')}
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {page.id === 'about' && (
+            <>
+              <SectionTitle title={t('About')} />
+              <div className="stack">
+                <div className="settings-row">
+                  <div className="settings-row__body">
+                    <div className="settings-row__title">Botdanna {version}</div>
+                    {update.state === 'downloading' && update.version && (
+                      <div className="settings-row__text">{t('Downloading Botdanna {version} in the background.', { version: update.version })}</div>
+                    )}
+                    {update.state === 'available' && update.version && (
+                      <div className="settings-row__text">{t('Botdanna {version} is available. Download it when you like.', { version: update.version })}</div>
+                    )}
+                    {update.state === 'ready' && update.version && (
+                      <div className="settings-row__text">{t('Botdanna {version} is ready. It installs when you close Botdanna.', { version: update.version })}</div>
+                    )}
+                  </div>
+                  {update.state === 'available' && (
+                    <button className="btn btn--primary btn--sm" onClick={() => void bridge?.update.download()}>
+                      {t('Download update')}
+                    </button>
+                  )}
+                  {update.state === 'ready' && (
+                    <button className="btn btn--primary btn--sm" onClick={() => void bridge?.update.install()}>
+                      {t('Restart to update')}
+                    </button>
+                  )}
+                  {bridge && (
+                    <button className="btn btn--ghost btn--sm" onClick={() => void checkUpdates()} disabled={checking}>
+                      {checking ? <Spinner dark /> : null} {t('Check for updates')}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {page.id === 'about' && (
+            <>
+              <SectionTitle title={t('Feedback')} />
+              {mode === 'supabase' ? (
+                <div className="feedback-box">
+                  <p className="settings-row__text">{t('Rate Botdanna from 1 to 5 stars and leave a comment if you like. It goes to the developer.')}</p>
+                  <div className="rate-stars" role="group" aria-label={t('Rating')}>
+                    {[1, 2, 3, 4, 5].map((value) => {
+                      const on = value <= (hoverRating || rating);
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          className={`rate-star ${on ? 'is-on' : ''}`}
+                          aria-label={tn('{count} star', '{count} stars', value, { count: value })}
+                          aria-pressed={rating === value}
+                          onClick={() => setRating(value)}
+                          onMouseEnter={() => setHoverRating(value)}
+                          onMouseLeave={() => setHoverRating(0)}
+                        >
+                          <Star fill={on ? 'currentColor' : 'none'} aria-hidden="true" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <textarea
+                    className="input rate-comment"
+                    maxLength={1000}
+                    value={comment}
+                    onChange={(event) => setComment(event.target.value)}
+                    placeholder={t('What would make Botdanna better? (optional)')}
+                    aria-label={t('Your comment')}
+                  />
+                  {feedbackError && <Notice tone="error">{t(feedbackError)}</Notice>}
+                  {feedbackWait > 0 && (
+                    <Notice tone="info">{t('You can send one feedback an hour. You can send another in {time}.', { time: waitText })}</Notice>
+                  )}
+                  <div className="row row--between">
+                    <span className="small muted">{rating ? '' : t('Choose a rating to send.')}</span>
+                    <button
+                      className="btn btn--primary"
+                      onClick={() => void sendFeedbackNow()}
+                      disabled={!rating || sendingFeedback || !backend || feedbackWait > 0}
+                    >
+                      {sendingFeedback ? <Spinner /> : null} {t('Send feedback')}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="settings-row">
+                  <div className="settings-row__body">
+                    <div className="settings-row__text">
+                      {t('Feedback is sent with an online account. On this device, nothing leaves your computer.')}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {keyToRemove && (
+            <ConfirmSheet
+              title={t('Remove this key?')}
+              confirmLabel={t('Remove key')}
+              onConfirm={() => void removeKey(keyToRemove)}
+              onClose={() => setKeyToRemove(null)}
+            >
+              {t('Your {provider} key is removed from this device. You can add it again at any time.', { provider: PROVIDER_LABEL[keyToRemove] })}
+            </ConfirmSheet>
+          )}
+    
+          {addOpen && (
+            <Sheet
+              title={t("Add this device's data?")}
+              onClose={() => setAddOpen(false)}
+              footer={
+                <>
+                  <button className="btn btn--ghost" onClick={() => setAddOpen(false)} disabled={adding}>
+                    {t('Cancel')}
+                  </button>
+                  <button className="btn btn--primary" onClick={bringProgress} disabled={adding}>
+                    {adding ? <Spinner /> : null} {t('Add to my account')}
+                  </button>
+                </>
+              }
+            >
+              <p className="muted">
+                {t('Chats, library files, your picture and your profile are copied. What is already in your account stays as it is.')}
+              </p>
+            </Sheet>
+          )}
+    
+          {switchOpen && (
+            <Sheet
+              title={t('Use Botdanna on this device?')}
+              onClose={() => setSwitchOpen(false)}
+              footer={
+                <>
+                  <button className="btn btn--ghost" onClick={() => switchToDevice(false)} disabled={switching}>
+                    {t('Switch without copying')}
+                  </button>
+                  <button className="btn btn--primary" onClick={() => switchToDevice(true)} disabled={switching}>
+                    {switching ? <Spinner /> : null} {t('Copy my data here')}
+                  </button>
+                </>
+              }
+            >
+              <p className="muted">{t('Your chats and files stay saved in your account. You can keep a copy on this device as well.')}</p>
+            </Sheet>
           )}
         </div>
       </div>
-
-      <SectionTitle title={t('Feedback')} />
-      {mode === 'supabase' ? (
-        <div className="feedback-box">
-          <p className="settings-row__text">{t('Rate Botdanna from 1 to 5 stars and leave a comment if you like. It goes to the developer.')}</p>
-          <div className="rate-stars" role="group" aria-label={t('Rating')}>
-            {[1, 2, 3, 4, 5].map((value) => {
-              const on = value <= (hoverRating || rating);
-              return (
-                <button
-                  key={value}
-                  type="button"
-                  className={`rate-star ${on ? 'is-on' : ''}`}
-                  aria-label={tn('{count} star', '{count} stars', value, { count: value })}
-                  aria-pressed={rating === value}
-                  onClick={() => setRating(value)}
-                  onMouseEnter={() => setHoverRating(value)}
-                  onMouseLeave={() => setHoverRating(0)}
-                >
-                  <Star fill={on ? 'currentColor' : 'none'} aria-hidden="true" />
-                </button>
-              );
-            })}
-          </div>
-          <textarea
-            className="input rate-comment"
-            maxLength={1000}
-            value={comment}
-            onChange={(event) => setComment(event.target.value)}
-            placeholder={t('What would make Botdanna better? (optional)')}
-            aria-label={t('Your comment')}
-          />
-          {feedbackError && <Notice tone="error">{t(feedbackError)}</Notice>}
-          {feedbackWait > 0 && (
-            <Notice tone="info">{t('You can send one feedback an hour. You can send another in {time}.', { time: waitText })}</Notice>
-          )}
-          <div className="row row--between">
-            <span className="small muted">{rating ? '' : t('Choose a rating to send.')}</span>
-            <button
-              className="btn btn--primary"
-              onClick={() => void sendFeedbackNow()}
-              disabled={!rating || sendingFeedback || !backend || feedbackWait > 0}
-            >
-              {sendingFeedback ? <Spinner /> : null} {t('Send feedback')}
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="settings-row">
-          <div className="settings-row__body">
-            <div className="settings-row__text">
-              {t('Feedback is sent with an online account. On this device, nothing leaves your computer.')}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {keyToRemove && (
-        <ConfirmSheet
-          title={t('Remove this key?')}
-          confirmLabel={t('Remove key')}
-          onConfirm={() => void removeKey(keyToRemove)}
-          onClose={() => setKeyToRemove(null)}
-        >
-          {t('Your {provider} key is removed from this device. You can add it again at any time.', { provider: PROVIDER_LABEL[keyToRemove] })}
-        </ConfirmSheet>
-      )}
-
-      {addOpen && (
-        <Sheet
-          title={t("Add this device's data?")}
-          onClose={() => setAddOpen(false)}
-          footer={
-            <>
-              <button className="btn btn--ghost" onClick={() => setAddOpen(false)} disabled={adding}>
-                {t('Cancel')}
-              </button>
-              <button className="btn btn--primary" onClick={bringProgress} disabled={adding}>
-                {adding ? <Spinner /> : null} {t('Add to my account')}
-              </button>
-            </>
-          }
-        >
-          <p className="muted">
-            {t('Chats, library files, your picture and your profile are copied. What is already in your account stays as it is.')}
-          </p>
-        </Sheet>
-      )}
-
-      {switchOpen && (
-        <Sheet
-          title={t('Use Botdanna on this device?')}
-          onClose={() => setSwitchOpen(false)}
-          footer={
-            <>
-              <button className="btn btn--ghost" onClick={() => switchToDevice(false)} disabled={switching}>
-                {t('Switch without copying')}
-              </button>
-              <button className="btn btn--primary" onClick={() => switchToDevice(true)} disabled={switching}>
-                {switching ? <Spinner /> : null} {t('Copy my data here')}
-              </button>
-            </>
-          }
-        >
-          <p className="muted">{t('Your chats and files stay saved in your account. You can keep a copy on this device as well.')}</p>
-        </Sheet>
-      )}
     </div>
   );
 }
