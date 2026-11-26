@@ -2,7 +2,7 @@
 // the version (tag v<version>), with the commit messages since the previous release as notes.
 // Run it after the commit has been pushed: npm run release
 import { execFileSync, execSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -43,6 +43,10 @@ if (!existsSync(installer) || !existsSync(updateInfo) || !existsSync(blockmap)) 
 for (const file of [installer, updateInfo, blockmap]) {
   if (!existsSync(file)) throw new Error(`Missing ${file} after the build.`);
 }
+// The same installer under a fixed name, so the download link on the website never changes:
+// .../releases/latest/download/botdanna-setup-x64.exe always gives the newest release.
+const fixedName = join(root, 'release', 'botdanna-setup-x64.exe');
+copyFileSync(installer, fixedName);
 
 let range = 'HEAD~30..HEAD';
 try {
@@ -59,6 +63,7 @@ const url = gh([
   'create',
   tag,
   installer,
+  fixedName,
   updateInfo,
   blockmap,
   '--target',
