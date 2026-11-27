@@ -1,7 +1,7 @@
 {
   "name": "botdanna",
   "productName": "Botdanna",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "description": "Botdanna: an AI English coach for Windows. Chat, talk live, check your writing and read with a coach that works from your own AI key.",
   "private": true,
   "type": "module",
